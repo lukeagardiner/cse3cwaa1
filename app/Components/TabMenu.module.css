@@ -1,0 +1,33 @@
+.container{
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.tabContainer {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    background-color: #f1f1f1;
+    overflow: hidden;
+}
+
+.tablinks {
+    backgound-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    text-decoration: none;
+    color: #000000;
+}
+
+.tablink:hover {
+    background-color: #ddd;
+}
+
+.tablink.active {
+    background-color: #3366ff;
+    border-bottom: 3px solid #0070f3;
+    font-weight: bold;
+}
