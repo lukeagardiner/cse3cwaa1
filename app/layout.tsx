@@ -6,7 +6,7 @@ import './globals.css'
 // font selection
 const inter = Inter({ subsets: ['latin']});
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'CSE3CWA - Assessment 1',
   description: 'Assignment 1 for Subject Cloud Web Application',
 }
