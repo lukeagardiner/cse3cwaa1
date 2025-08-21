@@ -1,13 +1,16 @@
-// app/page2.tsx
-import HamburgerMenu from './Components/HamburgerMenu';
-import TabMenu from './Components/TabMenu';
+
+//import Navigation from './Components/Navigation';
 
 export default function Home() {
     return (
         <div>
-            <HamburgerMenu />
-            <TabMenu />
-            <h1>Welcome to My Next.js App</h1>
+            {/*}
+            <Navigation />
+            */}
+            <h1>Some amazing tab content to get plugged in right here</h1>
+            <p>It's about to get epic</p>
+            {/* TODO */}
+            {/* Tab and Code Gen Logic */}
         </div>
     )
 }
