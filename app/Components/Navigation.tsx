@@ -12,7 +12,7 @@ const Navigation = () => {
 
     // shortlabel for mobile device
     const tabs = [
-        { id: 'Home', label: 'Home', shortlabel: '1', path: "/"},
+        { id: 'Tabs', label: 'Tabs', shortlabel: '1', path: "/"},
         { id: 'About', label: 'About', shortlabel: '2', path: "/about"},
         { id: 'CodingRaces', label: 'Coding Races', shortlabel: '3', path: "/coding-races" },
         { id: 'CourtRoom', label: 'Court Room', shortlabel: '4', path: "/court-room"},

@@ -9,7 +9,7 @@ const TabMenu = () => {
     const [selectedTab, setSelectedTab] = useState('Home');
 
     const tabs = [
-        { id: 'Home', label: '1. Home', path: "/"},
+        { id: 'Tabs', label: '1. Tabs', path: "/"},
         { id: 'About', label: '2. About', path: "/about"},
         { id: 'CodingRaces', label: '3. Coding Races', path: "/coding-races" },
         { id: 'CourtRoom', label: '4. Court Room', path: "/court-room"},
