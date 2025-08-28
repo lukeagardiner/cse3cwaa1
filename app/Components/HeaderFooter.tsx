@@ -1,6 +1,9 @@
+"use client"
+
 import { ReactNode } from 'react';
 import Navigation from './Navigation';
 import styles from './HeaderFooter.module.css';
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 interface HeaderFooterProps {
     children: ReactNode;
@@ -20,6 +23,7 @@ const getFormattedDateUTC = () => {
 
 // Presentation
 const HeaderFooter = ({ children } : HeaderFooterProps) => {
+    const { theme, toggleTheme} = useTheme();
     return  (
         <div className={styles.container}>
             {/* Header */}
@@ -34,6 +38,12 @@ const HeaderFooter = ({ children } : HeaderFooterProps) => {
                 </div>
                 {/* Header - Navigation Element */}
                 <Navigation />
+                {/* Header - Theme Mode Button Component */}
+                <div className={styles.themeSwitchContainer}>
+                    <button onClick={toggleTheme} className={styles.themeSwitch}>
+                        {theme === 'light' ? '🌞 Light Mode' : '🌙 Dark Mode'}
+                    </button>
+                </div>
             </header>
 
             {/* Body Content */}

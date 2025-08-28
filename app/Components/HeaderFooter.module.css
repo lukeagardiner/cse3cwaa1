@@ -7,16 +7,16 @@
 
 /* Header */
 .header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background-color: var(--muted-bg);
+    border-bottom: 1px solid var(--border);
     width: 100%;
 }
 
 /* Header Block */
 .headerContent {
     padding: 1rem 2rem;
-    background-color: #ffffff;
-    border-bottom: 4px solid #e9ecef
+    background-color: var(--header-background);
+    border-bottom: 4px solid var(--border);
 }
 
 .headerContainer {
@@ -28,30 +28,11 @@
     box-sizing: border-box;
 }
 
-/*
-.headerContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.2rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-
 .title {
     margin: 0;
     font-size: 2rem;
     font-weight: bold;
-    color: #333;
-    text-align: center;
-}
-*/
-.title {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
+    color: var(--primary-text);
     text-align: center;
     grid-column: 2;
 }
@@ -60,10 +41,10 @@
     font-size: 0.9rem;
     color: #666;
     font-weight: 500;
-    background-color: #f0f0f0;
+    background-color: var(--muted-bg);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     justify-self: end;
     margin-right: 1rem;
     grid-column: 3;
@@ -71,7 +52,7 @@
 
 .headerDivider {
     height: 4px;
-    background: linear-gradient(90deg, transparent, #0070f3, transparent);
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
     margin-top: 0.5rem;
     width: 95%;
     margin-left: auto;
@@ -90,7 +71,7 @@
 
 /* Footer Block */
 .footer {
-    background-color: #f8f9fa;
+    background-color: var(--muted-bg);
     padding: 1rem 0;
     margin-top: auto;
     width: 100%;
@@ -98,15 +79,33 @@
 
 .footerDivider {
     height: 4px;
-    backgound-color: #333;
+    backgound-color: var(--border);
     margin-bottom: 1rem;
 }
 
 .footerContent {
     text-align: center;
-    color: #666;
+    color: var(--muted-text);
     font-size: 0.9rem;
     padding: 0 1rem;
+}
+
+.themeSwitchContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.themeSwitch {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--header-background);
+    color: var(--primary-text);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
 }
 
 /* Responsive Design Elements */

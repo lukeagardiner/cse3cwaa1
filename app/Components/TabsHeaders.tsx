@@ -53,22 +53,57 @@ export default function TabsHeaders({
     return(
         <div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Tabs Headers:</span>
+                <span style={{ color: 'var(--text-primary)' }}>Tabs Headers:</span>
                 {/* Add and Remove controls */}
-                <button onClick={addTab} disabled={tabs.length >= MAX_TABS}>[+]</button>
-                <button onClick={removeTab} disabled={tabs.length <= 1}>[-]</button>
+                <button
+                    onClick={addTab}
+                    disabled={tabs.length >= MAX_TABS}
+                    style={{
+                        background: 'var(--elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 6,                 // numbers are px --alt use '6px'
+                        padding: '0.1em 0.5em',
+                        cursor: 'pointer'
+                    }}
+                >
+                    [+]
+                </button>
+                <button onClick={removeTab}
+                        disabled={tabs.length <= 1}
+                        style={{
+                            background: 'var(--elevated)',
+                            color: 'var(--text-primary)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 6,
+                            padding: '0.1em 0.5em',
+                            cursor: 'pointer'
+                        }}
+                >
+                    [-]
+                </button>
             </div>
             <div style={{ marginTop : '1em' }}>
                 {tabs.map((tab) => (
-                    <div key={tab.id} style={{ margin: '0.5em 0'}}>
+                    <div key={tab.id} style={{ margin: '0.5em 0', width: '100%' }}>
                         <button
                             style={{
                                 fontWeight: tab.id === activeTab ? 'bold' : 'normal',
-                                background: tab.id === activeTab ? '#eee' : 'transparent',
-                                border: 'none',
+                                background: tab.id === activeTab ? 'var(--elevated)' : 'transparent',
+                                color: 'var(--text-primary)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 6,
                                 cursor: 'pointer',
                                 fontSize: '1.2em',
-                                padding: '0.2em 0.3em'
+                                padding: '0.2em 0.3em',
+                                width: '100%',
+                                minWidth: '110px',
+                                maxWidth: '200px',
+                                display: 'block',
+                                boxSizing: 'border-box',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
                             }}
                             onClick={() => setActiveTab(tab.id)}
                         >
@@ -80,8 +115,15 @@ export default function TabsHeaders({
                                     style={{
                                         fontWeight: 'bold',
                                         fontSize: '1em',
-                                        border: '1px solid #ddd',
-                                        padding: '0.1em 0.3em'
+                                        border: '1px solid var(--border)',
+                                        background: 'var(--background)',
+                                        color: 'var(--text-primary)',
+                                        borderRadius: 4,
+                                        outline: 'none',
+                                        padding: '0.1em 0.3em',
+                                        width: '100%',
+                                        maxWidth: '100%',
+                                        boxSizing: 'border-box'
                                     }}
                                 />
                             ) : (
