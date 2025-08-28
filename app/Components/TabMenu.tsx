@@ -32,6 +32,7 @@ const TabMenu = () => {
                            selectedTab === tab.id ? styles.active : ''
                        }`}
                        onClick={() => handleTabClick(tab.id)}
+                       aria-current={selectedTab === tab.id ? 'page' : undefined}
                    >
                        {tab.label}
                    </Link>

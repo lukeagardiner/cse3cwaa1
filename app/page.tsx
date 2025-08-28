@@ -199,6 +199,7 @@ export default function Tabs() {
                     rows={10}
                     style={{width: '100%', marginTop: '0.5rem'}}
                     placeholder={`Add content here for ${activeTabLabel}...`}
+                    aria-label={`Content for ${activeTabLabel}`}
                 />
             </div>
 
