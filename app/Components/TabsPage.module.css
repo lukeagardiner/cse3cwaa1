@@ -15,7 +15,7 @@
 .tabsContents{
     flex: 2 1 40%;
     min-width: 400px;
-    border: 2px solid #333333;
+    border: 2px solid var(--border);
     padding: 1rem;
 }
 

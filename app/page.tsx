@@ -1,8 +1,14 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TabsHeaders from './Components/TabsHeaders';
 import styles from './Components/TabsPage.module.css';
+
+// Local storage keys
+const LS_TABS_KEY='tabs';
+const LS_TABS_CONTENT_KEY='tabContents';
+const LS_ACTIVE_TAB_KEY='activeTab';
+const LS_GENERATED_HTML_KEY='generated-html';
 
 export default function Tabs() {
     // setup 3 placeholder tabs - up to 15 tabs with editable label
@@ -20,6 +26,20 @@ export default function Tabs() {
     const activeContent = tabContents[activeTab] || "";
     // CodeGen
     const [ generatedHTML, setGeneratedHTML ] = useState('');
+
+    // Push everything to local storage after a change
+    useEffect(() => {
+        try
+        {
+            localStorage.setItem(LS_TABS_KEY, JSON.stringify(tabs));
+            localStorage.setItem(LS_TABS_CONTENT_KEY, JSON.stringify(tabContents));
+            localStorage.setItem(LS_ACTIVE_TAB_KEY, JSON.stringify(activeTab));
+        }
+        catch (e)
+        {
+            console.warn('Failed to save tab content in localStorage', e);
+        }
+    }, [tabs, tabContents, activeTab]);
 
     // Pickup any changes in the text area
     function handleTabContentChange(tabId: number, value: string) {
@@ -119,9 +139,45 @@ export default function Tabs() {
 </html>
 `.trim()
         setGeneratedHTML(html);
+        // Add output to local storage
+        try
+        {
+            localStorage.setItem(LS_GENERATED_HTML_KEY, html);
+        }
+        catch (e)
+        {
+            console.warn('Failed to save generated html localStorage - unknown error', e);
+        }
     }
 
+    // Function to reset page state from button
+    function handleReset() {
+        const initialTabs = [
+            {id: 1, label: 'Step 1'},
+            {id: 2, label: 'Step 2'},
+            {id: 3, label: 'Step 3'},
+        ];
+        setTabs(initialTabs);
+        setActiveTab(1);
+        setTabContents({});
+        setGeneratedHTML('');
 
+        try
+        {
+            localStorage.removeItem(LS_TABS_KEY);
+            localStorage.removeItem(LS_TABS_CONTENT_KEY);
+            localStorage.removeItem(LS_ACTIVE_TAB_KEY);
+            localStorage.removeItem(LS_GENERATED_HTML_KEY);
+        }
+        catch (e)
+        {
+            console.warn('Failed to clear local storage - a problem occurred.', e);
+        }
+    }
+
+    /********************************************
+     ************ PRESENTATION LOGIC ************
+     ********************************************/
     return (
         <div className={styles.tabsPageLayout}>
             {/* Tabs Headers */}
@@ -143,6 +199,7 @@ export default function Tabs() {
                     rows={10}
                     style={{width: '100%', marginTop: '0.5rem'}}
                     placeholder={`Add content here for ${activeTabLabel}...`}
+                    aria-label={`Content for ${activeTabLabel}`}
                 />
             </div>
 
@@ -158,6 +215,24 @@ export default function Tabs() {
                         style={{width: '100%', fontFamily: 'monospace', marginTop: '1em', overflowX: 'auto'}}
                     />
                 )}
+            </div>
+
+            {/* Reset Button */}
+            <div style={{marginTop: '1rem'}} >
+                <button
+                    onClick={handleReset}
+                    aria-label="Reset tabs and content"
+                    style={{
+                        background: 'var(--elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 8,
+                        padding: '0.5em 0.9em',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Clear / reset
+                </button>
             </div>
         </div>
     )

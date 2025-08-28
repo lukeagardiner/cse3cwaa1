@@ -44,6 +44,8 @@ const Navigation = () => {
                     className={styles.hamburger}
                     onClick={() => setMenuOpen(!menuOpen)}
                     aria-label="Toggle menu"
+                    aria-expanded={menuOpen}
+                    aria-controls="primary-mobile-menu"
                 >
                     {/* *** STUDY syntax aria label */}
                     <div className={`${styles.bar} ${menuOpen ? styles.bar1Open : ''}`} />
@@ -53,7 +55,7 @@ const Navigation = () => {
             </div>
 
             { /* Dropdown menu for mobile devices */ }
-            <div className={`${styles.mobileMenu} ${menuOpen ? styles.open : ''}`}>
+            <div id="primary-mobile-menu" className={`${styles.mobileMenu} ${menuOpen ? styles.open : ''}`}>
                 {tabs.map((tab) => (
                     <Link
                       key={tab.id}

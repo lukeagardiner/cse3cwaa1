@@ -1,6 +1,7 @@
 // components/HamburgerMenu.tsx
 'use client'
 import { useState } from 'react';
+import Link from 'next/link';
 import styles from './HamburgerMenu.module.css';
 
 // Define menu behaviour
@@ -13,19 +14,19 @@ const HamurgerMenu = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.hamburger} onClick={toggleMenu}>
+            <button type="button" className={styles.hamburger} onClick={toggleMenu} aria-label="Toggle menu" aria-expanded={isOpen}>
                 <div className={isOpen ? styles.barOpen : styles.bar}></div>
                 <div className={isOpen ? styles.barOpen : styles.bar}></div>
                 <div className={isOpen ? styles.barOpen : styles.bar}></div>
-            </div>
+            </button>
             <nav className={isOpen ? styles.menuOpen : styles.menu}>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                    <li><a href="/coding-races/page">Coding Races</a></li>
-                    <li><a href="/court-room/page">Court Room</a></li>
-                    <li><a href="/escape-room/page">Court Room</a></li>
+                    <li><Link href="/">Home</Link></li>
+                    <li><Link href="/about">About</Link></li>
+                    <li><Link href="/contact">Contact</Link></li>
+                    <li><Link href="/coding-races/page">Coding Races</Link></li>
+                    <li><Link href="/court-room/page">Court Room</Link></li>
+                    <li><Link href="/escape-room/page">Court Room</Link></li>
                 </ul>
             </nav>
         </div>
