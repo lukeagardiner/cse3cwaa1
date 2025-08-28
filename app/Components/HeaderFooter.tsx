@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import Navigation from './Navigation';
 import styles from './HeaderFooter.module.css';
 import { useTheme } from "@/app/contexts/ThemeContext";
+import Breadcrumbs from "./Breadcrumbs";
 
 interface HeaderFooterProps {
     children: ReactNode;
@@ -38,16 +39,16 @@ const HeaderFooter = ({ children } : HeaderFooterProps) => {
                 </div>
                 {/* Header - Navigation Element */}
                 <Navigation />
+            </header>
+
+            {/* Body Content */}
+            <main className={styles.body}>
                 {/* Header - Theme Mode Button Component */}
                 <div className={styles.themeSwitchContainer}>
                     <button onClick={toggleTheme} className={styles.themeSwitch}>
                         {theme === 'light' ? '🌞 Light Mode' : '🌙 Dark Mode'}
                     </button>
                 </div>
-            </header>
-
-            {/* Body Content */}
-            <main className={styles.body}>
                 { children }
             </main>
 
@@ -55,6 +56,10 @@ const HeaderFooter = ({ children } : HeaderFooterProps) => {
             <footer className={styles.footer}>
                 <div className={styles.footerDivider}></div>
                 <div className={styles.footerContent}>
+                    {/* Breadcrumb Path Display */}
+                    <div style={{ marginBottom: '0.5rem' }}>
+                        <Breadcrumbs />
+                    </div>
                     <p>&copy;  Luke Gardiner, 20219568, {getFormattedDateUTC()} </p>
                 </div>
             </footer>

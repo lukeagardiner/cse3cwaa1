@@ -53,14 +53,14 @@ export default function TabsHeaders({
     return(
         <div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-primary)' }}>Tabs Headers:</span>
+                <span style={{ color: 'var(--primary-text)' }}>Tabs Headers:</span>
                 {/* Add and Remove controls */}
                 <button
                     onClick={addTab}
                     disabled={tabs.length >= MAX_TABS}
                     style={{
                         background: 'var(--elevated)',
-                        color: 'var(--text-primary)',
+                        color: 'var(--primary-text)',
                         border: '1px solid var(--border)',
                         borderRadius: 6,                 // numbers are px --alt use '6px'
                         padding: '0.1em 0.5em',
@@ -73,7 +73,7 @@ export default function TabsHeaders({
                         disabled={tabs.length <= 1}
                         style={{
                             background: 'var(--elevated)',
-                            color: 'var(--text-primary)',
+                            color: 'var(--primary-text)',
                             border: '1px solid var(--border)',
                             borderRadius: 6,
                             padding: '0.1em 0.5em',
@@ -90,7 +90,7 @@ export default function TabsHeaders({
                             style={{
                                 fontWeight: tab.id === activeTab ? 'bold' : 'normal',
                                 background: tab.id === activeTab ? 'var(--elevated)' : 'transparent',
-                                color: 'var(--text-primary)',
+                                color: 'var(--primary-text)',
                                 border: '1px solid var(--border)',
                                 borderRadius: 6,
                                 cursor: 'pointer',
@@ -117,7 +117,7 @@ export default function TabsHeaders({
                                         fontSize: '1em',
                                         border: '1px solid var(--border)',
                                         background: 'var(--background)',
-                                        color: 'var(--text-primary)',
+                                        color: 'var(--primary-text)',
                                         borderRadius: 4,
                                         outline: 'none',
                                         padding: '0.1em 0.3em',

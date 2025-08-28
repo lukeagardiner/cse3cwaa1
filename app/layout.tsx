@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import HeaderFooter from './Components/HeaderFooter';
 import {ThemeProvider} from "@/app/contexts/ThemeContext";
 import './globals.css'
+import RouteTacker from "./RouteTracker";
+import Breadcrumbs from "./Components/Breadcrumbs";
 
 // font selection
 const inter = Inter({ subsets: ['latin']});
@@ -21,6 +23,8 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
             <ThemeProvider>
+                {/* Cookies */}
+                <RouteTacker />
                 <HeaderFooter>
                     {children}
                 </HeaderFooter>
