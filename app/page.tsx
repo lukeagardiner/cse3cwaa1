@@ -38,11 +38,11 @@ export default function Tabs() {
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>'Generated Tabs Webpage'</title>
+    <title>Generated Tabs Webpage</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            magin: 0;
+            margin: 0;
             padding: 0;
             background: #fafafa;
             color: #222;
@@ -90,11 +90,35 @@ export default function Tabs() {
 <body>
     <div class="tabs-container">
         <div class="tab-headers">
-        
+            ${tabs.map((tab, idx) => `
+                <button class="tab-button${idx === 0 ? ' active' : ''}" onclick="showTab(${idx})" id="tab-button-${idx}">
+                    ${tab.label}
+                </button>
+            `).join('')}
         </div>
-    </div>      
+        ${tabs.map((tab, idx) => `
+            <div class="tab-content${idx === 0 ? ' active' : ''}" id="tab-content-${idx}">
+                ${tabContents[tab.id] ? tabContents[tab.id].replace(/\n/g, "<br/>") : "<em>no content provided.</em>"}
+            </div>
+        `).join('')}
+    </div>
+    <script>
+        function showTab(idx) {
+            var tabButtons = document.querySelectorAll('.tab-button');
+            var tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(function(btn, i) {
+                btn.classList.toggle('active', i === idx);
+            });
+            tabContents.forEach(function(content, i) {
+                content.classList.toggle('active', i === idx);
+            });
+        }
+    </script>
+          
 </body>
-`
+</html>
+`.trim()
+        setGeneratedHTML(html);
     }
 
 
@@ -125,9 +149,16 @@ export default function Tabs() {
             {/* Code Generation */}
             <div className={styles.tabsOutput}>
                 <h2>Output</h2>
-                {/* TODO */}
+                <button onClick={handleGenerateHTML}>Generate HTML</button>
+                {generatedHTML && (
+                    <textarea
+                        readOnly
+                        value={generatedHTML}
+                        rows={15}
+                        style={{width: '100%', fontFamily: 'monospace', marginTop: '1em', overflowX: 'auto'}}
+                    />
+                )}
             </div>
         </div>
     )
-
 }
