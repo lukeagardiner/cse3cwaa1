@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import HeaderFooter from './Components/HeaderFooter';
+import {ThemeProvider} from "@/app/contexts/ThemeContext";
 import './globals.css'
 
 // font selection
@@ -19,10 +20,11 @@ export default function RootLayout({
   return (
       <html lang="en">
         <body className={inter.className}>
-            <HeaderFooter>
-                {children}
-            </HeaderFooter>
-
+            <ThemeProvider>
+                <HeaderFooter>
+                    {children}
+                </HeaderFooter>
+            </ThemeProvider>
         </body>
       </html>
   )
