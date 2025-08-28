@@ -1,0 +1,25 @@
+.tabsPageLayout {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    width: 100%;
+}
+
+.tabsHeaders{
+    flex: 1 1 20%;
+    min-width: 110px;
+    max-width: 200px;
+    overflow: auto;
+}
+
+.tabsContents{
+    flex: 2 1 40%;
+    min-width: 400px;
+    border: 2px solid #333333;
+    padding: 1rem;
+}
+
+.tabsOutput {
+    flex: 1 1 40%;
+    min-width: 300px;
+}
