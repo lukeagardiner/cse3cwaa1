@@ -206,33 +206,40 @@ export default function Tabs() {
             {/* Code Generation */}
             <div className={styles.tabsOutput}>
                 <h2>Output</h2>
-                <button onClick={handleGenerateHTML}>Generate HTML</button>
-                {generatedHTML && (
-                    <textarea
-                        readOnly
-                        value={generatedHTML}
-                        rows={15}
-                        style={{width: '100%', fontFamily: 'monospace', marginTop: '1em', overflowX: 'auto'}}
-                    />
-                )}
-            </div>
 
-            {/* Reset Button */}
-            <div style={{marginTop: '1rem'}} >
-                <button
-                    onClick={handleReset}
-                    aria-label="Reset tabs and content"
-                    style={{
-                        background: 'var(--elevated)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 8,
-                        padding: '0.5em 0.9em',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Clear / reset
-                </button>
+                {/* Buttons Div Container */}
+                <div className={styles.tabsActions}>
+
+                    {/* Generate Button */}
+                    <button
+                        type="button"
+                        onClick={handleGenerateHTML}
+                        aria-label="Generate HTML Output"
+                        className={styles.btn}
+                    >
+                        Generate HTML
+                    </button>
+
+                    {/* Reset Button */}
+                    <button
+                        type="button"
+                        onClick={handleReset}
+                        aria-label="Reset tabs and content"
+                        className={styles.btn}
+                    >
+                        Clear / reset
+                    </button>
+                </div>
+                    {/* CodeGen Display */ }
+                    {generatedHTML && (
+                        <textarea
+                            readOnly
+                            value={generatedHTML}
+                            rows={15}
+                            className={styles.codePreview}
+                            style={{width: '100%', fontFamily: 'monospace', marginTop: '1em', overflowX: 'auto'}}
+                        />
+                    )}
             </div>
         </div>
     )
