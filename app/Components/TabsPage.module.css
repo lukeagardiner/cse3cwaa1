@@ -23,3 +23,56 @@
     flex: 1 1 40%;
     min-width: 300px;
 }
+
+.tabsActions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    font: inherit;
+    padding: 0.5em 0.9em;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border, #d0d7de);
+    background: var(--elevated, #fff);
+    color: var(--primary-text, #24292f);
+}
+
+.btnPrimary {
+    background: #0070f3;
+    color: #fff;
+    border-color: #0070f3;
+    font-weight: 600;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn:focus-visible {
+    outline: 2px solid #005ac1;
+    outline-offset: 2px;
+}
+
+.codePreview {
+    width: 100%;
+    border: 1px solid var(--border, #d0d7de);
+    border-radius: 8px;
+    background: var(--background, #fff);
+    padding: 0.75rem;
+    box-sizing: border-box;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    margin-top: 0.25rem;
+    overflow-x: auto;
+}
+
+/* NEW: tidy the content textarea spacing/width */
+.contentTextarea {
+    width: 100%;
+    margin-top: 0.5rem;
+}
