@@ -24,9 +24,9 @@ const HamurgerMenu = () => {
                     <li><Link href="/">Home</Link></li>
                     <li><Link href="/about">About</Link></li>
                     <li><Link href="/contact">Contact</Link></li>
-                    <li><Link href="/coding-races/page">Coding Races</Link></li>
-                    <li><Link href="/court-room/page">Court Room</Link></li>
-                    <li><Link href="/escape-room/page">Court Room</Link></li>
+                    <li><Link href="/app/(client)/coding-races/page">Coding Races</Link></li>
+                    <li><Link href="/app/(client)/court-room/page">Court Room</Link></li>
+                    <li><Link href="/app/(client)/escape-room/page">Court Room</Link></li>
                 </ul>
             </nav>
         </div>
