@@ -20,27 +20,27 @@ export default function AboutPage() {
                 How to use this site (Video)
             </h2>
             <figure style={{ margin: 0 }}>
-                <div
-                    role="img"
-                    aria-label="How to use this site video placeholder"
+                <video
+                    controls
+                    preload="metadata"
+                    playsInline
                     style={{
+                        display: 'block',
                         width: '100%',
-                        aspectRatio: '16 / 9',
-                        border: '2px dashed #bbb',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#666',
-                        background: '#f7f7f7',
+                        borderRadius: 8,
+                        border: '1px solid var(--border, #d0d7de)',
+                        background: '#000'
                     }}
+                    aria-label="How to use this site video turorial"
                 >
-                    Video placeholder — coming soon
-                </div>
-                <figcaption style={{ marginTop: '0.5rem', color: '#666' }}>
-                    A short website guide will appear here.
+                    <source src="/videos/howto.mp4" type="video/mp4" />
+                    Sorry, your browser doesn't support embedded videos. You can download the video here:
+                    <a href='/videos/howto.mp4'>Download MP4</a>
+                </video>
+                <figcaption style={{ marginTop: '0.5rem', color: '#666', textAlign: 'center' }}>
+                    Having trouble? <a href='/videos/howto.mp4'>Download the MP4</a>
                 </figcaption>
             </figure>
         </section>
-    )
+    );
 }
