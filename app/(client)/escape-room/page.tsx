@@ -1,5 +1,9 @@
 "use client"
 import React, { useEffect, useMemo, useState, useCallback } from "react";
+// import { useNavigate } from "react-router-dom"
+
+
+
 
 /**
  * Escape room menu
@@ -15,6 +19,8 @@ type BgState = "base" | "safeSolved" | "keySolved" | "doorSolved";
 // for tracking where the user is up to
 type Stage = "safe" | "key" | "door";
 type Progress = { safe: boolean; key: boolean; door: boolean; updatedAt?: number };
+
+// const navigate = useNavigate();
 
 // ########## Action Card Definition ##########
 function ActionCard({ title, onClick }: { title: string, onClick: () => void }) {
@@ -339,6 +345,7 @@ export default function EscapeRoom() {
                                 {saving ? "Saving..." : "Save Progress"}
                             </button>
                         </div>
+                        { /*
                         <p className="mt-4 text-xs opacity-70">
                             Add for React Router :
                             call <code>navigate(`/coding-races/${"safe" | "key" | "door"}`)</code> inside <code>beginStage()</code>.
@@ -346,6 +353,7 @@ export default function EscapeRoom() {
                             <code>localStorage.setItem("escapeRoomSolvedStage", stage)</code> in the Coding Races Page
                             so this menu updates automatically.
                         </p>
+                        */ }
                     </div>
                 </div>
             </div>
