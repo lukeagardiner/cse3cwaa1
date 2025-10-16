@@ -1,11 +1,12 @@
+"use client"
 //app/(client)/coding-races/[stage]/page.tsx
 
 import React from "react";
 import { useParams, notFound } from "next/navigation";
 
 import SafePuzzle from "@/app/Components/CodingRaces/SafePuzzle";
-import KeyPuzzle from "@/app/Components/CodingRaces/KeyPuzzle";
-import DoorPuzzle from "@/app/Components/CodingRaces/DoorPuzzle";
+//import KeyPuzzle from "@/app/Components/CodingRaces/KeyPuzzle";
+//import DoorPuzzle from "@/app/Components/CodingRaces/DoorPuzzle";
 //import DoorPuzzle from "@/Components/coding-races/DoorPuzzle"; // incorrect route
 
 type Stage = "safe" | "key" | "door";
@@ -29,10 +30,10 @@ export default function CodingRacesRoute() {
     switch (stage) {
         case "safe":
             return <SafePuzzle {...commonProps} />;
-        case "key":
+  /*      case "key":
             return <KeyPuzzle  {...commonProps} />;
         case "door":
-            return <DoorPuzzle  {...commonProps} />;
+            return <DoorPuzzle  {...commonProps} />; */
         default:
             notFound();
     }

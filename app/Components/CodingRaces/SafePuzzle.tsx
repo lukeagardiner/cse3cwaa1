@@ -1,6 +1,5 @@
-// app/Components/SafePuzzle.tsx
-
 "use client"
+// app/Components/SafePuzzle.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
