@@ -1,9 +1,6 @@
 "use client"
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-// import { useNavigate } from "react-router-dom"
-
-
-
+import { useRouter } from "next/navigation";
 
 /**
  * Escape room menu
@@ -36,6 +33,7 @@ function ActionCard({ title, onClick }: { title: string, onClick: () => void }) 
 }
 
 export default function EscapeRoom() {
+    const router = useRouter();
     const images = useMemo(() => ({
         base: "/images/escape-room/base.png",
         safeSolved: "/images/escape-room/safesolved.png",
@@ -102,7 +100,8 @@ export default function EscapeRoom() {
         // React Router usage placeholder
         // navigate(`/coding-races/${stage}`/};
         // Alternative is callback/dispatch to game shell or dynamic puzzle load
-        alert(`Enter stage:  ${stage} → load Coding Races`);
+        // alert(`Enter stage:  ${stage} → load Coding Races`); // Replaced when implementing dynamic puzzle routing
+        router.push(`/coding-races/${stage}`);
     }
 
     // ----- After a stage puzzle from coding-races is solved
