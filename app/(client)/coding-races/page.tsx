@@ -278,9 +278,49 @@ export default function CodingRacesPage(props: { stage?: Stage; combination?: nu
                     </div>
 
                     {/* Terminal Window */}
-                    
+                    <div className="p-3 rounded-xl border boder-zinc-800 bg-zinc-900/60">
+                        <div className="flex items-center justify-between mb-2">
+                            <h2 className="text-sm font-medium">Terminal</h2>
+                            <span
+                                className={`text-xs px-2 py-0.5 rounded border ${
+                                    status === "running"
+                                    ? "border-amber-500 text-amber-300" 
+                                    : status === "success"
+                                    ? "border-emerald-600 text-emerald-300"
+                                    : status === "error"
+                                    ? "border-rose-600 text-rose-300"
+                                    : status === "timeout"
+                                    ? "border-yellow-700 text-yellow-300"
+                                    : "border-zinc-700 text-zinc-400"
+                                }`}
+                            >
+                                {status.toUpperCase()}
+                            </span>
+                        </div>
+                        <pre className="h-64 md:h-[28rem] overflow-auto rounded-lg bg-black/80 text-green-300 p-3 text-xs leading-5">
+                            {output}
+                        </pre>
+                            {status === "success" && (
+                                <div className="mt-2 text-xs text-emerald-300">
+                                    Progress saved. Return to escape room to find your next puzzle.
+                                </div>
+                            )}
+                    </div>
+                </div>
+
+                {/* Hints + Instructions */}
+                <div className="mt-4 p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 text-xs leading-5">
+                    <details>
+                        <summary className="cursor-pointer font medium">Hints</summary>
+                        <ul className="list-disc ml-6 space-y-1">
+                            <li>The variable <code>combination</code> is a number like <code>4aa</code>.</li>
+                            <li>Define a function <code>bruteforce()</code> that returns the correct safe code.</li>
+                            <li>Loop from <code>0</code> to <code>999</code> amd compare each value with the <code>combination</code>.</li>
+                            <li>You can emit logs with <code>console.log()</code> - they'll appear in the terminal.</li>
+                        </ul>
+                    </details>
                 </div>
             </div>
         </div>
-    )
+    );
 }
