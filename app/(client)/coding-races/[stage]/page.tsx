@@ -1,7 +1,7 @@
 // coding-races/page.tsx
 
 "use client"
-import React, {use, useEffect, useMemo, useRef, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {clearInterval} from "node:timers";
 // Next.js app router: read [stage] from useParams
 // import { userParams } from "next/navigation";
