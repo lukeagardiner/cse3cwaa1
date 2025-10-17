@@ -14,9 +14,9 @@ type Props = {
 };
 
 // TODO
-// have a ran function to set the code on each attempt
+// have a ran function to set the binaryKey on each attempt (then compute the hex key but not reveal it to the user)
 // we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
-// could make it a little more challenging by saying numbers 0-5 and letters abc and the combination always contains a repeat
+// set a minimum length etc
 // must cover 000 as string
 
 // Most basic example without extended conditions above
@@ -49,8 +49,32 @@ function bruteForce(combination: string) {
 }
  */
 
-const DEFAULT_TEMPLATE = `// -- Safe Game: open the safe to get the door key.
-// Objective: brute-force a 3-digit code (000..999) to unlocks the safe.
+// --------- Compute Expected Hex Answer ---------
+function computeExoectedHexAnswerKey(binaryKey: string): string {
+    const clean = binaryKey.replace(/\+/g,"");
+    if (!/^[01]+$/.test(clean)) {
+        throw new Error("Compute Error: binaryKey input constains non-binary characters");
+    }
+    // pad to multiple of 4 chars on the left
+    const padded = clean.length % 4 === 0 ? clean : clean.padStart(Math.ceil(clean.length / 4) * 4, "0");
+    // convert to hex (uppercase) without 0x
+    let hex = "";
+    for (let i = 0; i < padded.length; i += 4)  {
+        const block = padded.slice(i, i + 4);
+        const value = parseInt(block, 2);
+        hex += value.toString(16);
+    }
+    return hex.toUpperCase();
+}
+
+
+// --------- Game Player Instruction and Template ---------
+const DEFAULT_TEMPLATE = `// ==== Key Game: Convert the key code from binary to hex ===
+// You broke into the safe and you now have a key code for the door to escape. Just one 
+// problem, the keypad on the door only accepts hexadecimal input and your code is in 
+// binary. Implement convertToHex(bin) to convert the binary key and retrun the UPPERCASE 
+// hex string (no "0x").
+// ------
 // The 'combination' variable has been set by the game (e.g. 111).
 // Return the correct code before the clock runs out to unlock the safe and move to the next puzzle
 // May the coding Gods have mercy on your soul ---------|||
