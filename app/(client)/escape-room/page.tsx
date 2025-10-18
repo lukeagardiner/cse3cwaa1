@@ -236,7 +236,7 @@ export default function EscapeRoom() {
                 </header>
 
                 {/* Setup background with overlayed zones */}
-                <div className="relative w-full" style={{aspectRatio: "28 / 16"}}>
+                <div className="relative w-full max-w-5xl mx-auto" style={{aspectRatio: "1 / 1"}}>
                     <img
                         src={currentSrc}
                         alt="Escape Room Background"
