@@ -18,9 +18,17 @@ type Props = {
 // we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
 // could make it a little more challenging by saying numbers 0-5 and letters abc and the combination always contains a repeat
 // must cover 000 as string
+// protect if someone tries to print the value and cheat
+// e.g. you've solved the problem but did you cheat.. your code can't break other combinations... test it with 4 more random
+// 3 digit combinations before unlocking the next stage.
+
 
 // Most basic example without extended conditions above
 /*
+// TBC
+function convertToHex(bin) {
+
+}
 function bruteForce(combination: string) {
     // ...your code goes here
     for (let i = 0; i <= 999; i++ {

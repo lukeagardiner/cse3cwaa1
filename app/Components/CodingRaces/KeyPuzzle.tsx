@@ -17,35 +17,12 @@ type Props = {
 // have a ran function to set the binaryKey on each attempt (then compute the hex key but not reveal it to the user)
 // we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
 // set a minimum length etc
-// must cover 000 as string
 
 // Most basic example without extended conditions above
 /*
-function bruteForce(combination: string) {
-    // ...your code goes here
-    for (let i = 0; i <= 999; i++ {
-        // hint-1 zero-pad to 3 digits if you want to print: i.toString().padStart(3, "0")
-        string code = '';
-        if (i === 0) {
-            code = '000'; // cater to three digits....
-            // also have to cater to leading zeros etc
-        }
-        else {
-            code = i.ToString();
-            // etc, etc
-        }
-        // ----- This block must remain to pass ----
-        if (code === combination) {
-            console.log("You have unlocked the safe");
-            return code;
-        }
-        else {
-            code = ControlCode;
-        }
-    }
-    // ----- This block must remain to pass ----
+//TBC
+function convertToHex(bin) {
 
-    return code; // failed
 }
  */
 
@@ -53,7 +30,7 @@ function bruteForce(combination: string) {
 function computeExoectedHexAnswerKey(binaryKey: string): string {
     const clean = binaryKey.replace(/\+/g,"");
     if (!/^[01]+$/.test(clean)) {
-        throw new Error("Compute Error: binaryKey input constains non-binary characters");
+        throw new Error("Compute Error: binaryKey input contains non-binary characters");
     }
     // pad to multiple of 4 chars on the left
     const padded = clean.length % 4 === 0 ? clean : clean.padStart(Math.ceil(clean.length / 4) * 4, "0");
@@ -71,41 +48,32 @@ function computeExoectedHexAnswerKey(binaryKey: string): string {
 // --------- Game Player Instruction and Template ---------
 const DEFAULT_TEMPLATE = `// ==== Key Game: Convert the key code from binary to hex ===
 // You broke into the safe and you now have a key code for the door to escape. Just one 
-// problem, the keypad on the door only accepts hexadecimal input and your code is in 
-// binary. Implement convertToHex(bin) to convert the binary key and retrun the UPPERCASE 
-// hex string (no "0x").
-// ------
-// The 'combination' variable has been set by the game (e.g. 111).
-// Return the correct code before the clock runs out to unlock the safe and move to the next puzzle
-// May the coding Gods have mercy on your soul ---------|||
+// problem, the escape room door keypad is hexadecimal your key is in binary. 
+// Implement convertToHex(bin) to convert the binary key & return UPPERCASE hex STRING (no "0x").
+// --Notes:
+// - \`bin\` may contain spaces - clean if needed
+// - if length isn't a multiple of 4 you may - you may need to adjust the padding 
+// - Return HEX in UPPERCASES with no spaces to unlock the next stage... and be quiet, or you may wake Bert up.
 
-function bruteForce() {
+function convertToHex(bin) {
     // ...your code goes here
-    // console.log(...) to print progress
-    // compare your code to the variable 'combination' e.g. if (code === combination) {
-    // return the correct code when found
+    // return "...";
 }
 `;
 
-export default function SafePuzzle({
-    // Updated for AppRouter implementation
+export default function KeyPuzzle({
     stage: stageProp,
-    combination = 488, // needs to be random later
-    timeLimitMs = 3000, // worker method hard timeout
+    binaryKey = "1010 0111 0010 1111 1100 1001 0001 1010  1111 0001 0010 1010", // needs to be random later
+    timeLimitMs = 5000, // worker method hard timeout
     onComplete,
 } : Props ) {
 
-    //const stage = (props.stage ?? "safe") as Stage; // fallback code to remove if we're including router params later
-    //const combination = props.combination ?? 488; // Safe combo ** This needs to be randomly generated eventually
-    //const timeLimitMs = props.timeLimitMs ?? 3000; // worker method hard timeout
     const params = useParams() as { stage?: Stage };
     const stage = (params?.stage ?? stageProp ?? "safe") as Stage;
 
     // --------- Timer ---------
     const [elapsedMs, setElapsedMs] = useState(0);
     const [timerRunning, setTimerRunning] = useState(false);
-    //const timerRef = useRef<number | null>(null);
-    //const tickRef = useRef<number | null>(null);
     const hardTimeoutRef = useRef<number | null>(null);
     const tickRef = useRef<number | null>(null);
 
@@ -133,8 +101,6 @@ export default function SafePuzzle({
 
     useEffect(() => {
         return () => {
-            //if (tickRef.current != null) window.clearInterval(tickRef.current);
-            //if (timerRef.current != null) window.clearTimeout(timerRef.current);
             if (tickRef.current != null) window.clearInterval(tickRef.current);
             if (hardTimeoutRef.current != null) window.clearTimeout(hardTimeoutRef.current);
         };
@@ -144,7 +110,18 @@ export default function SafePuzzle({
     const [code, setCode] = useState(DEFAULT_TEMPLATE); // gets the template code
     const [status, setStatus] = useState<RunStatus>("idle");
     const [output, setOutput] = useState<string>("(terminal ready)\n");
-    const [result, setResult] = useState<number | null>(null);
+    // const [result, setResult] = useState<number | null>(null);
+
+    // Calculate expected and don't show to user
+    const [expectedHexKey, setExpectedHexKey] = useState<string>("");
+    useEffect(() => {
+        try {
+            setExpectedHexKey(computeExoectedHexAnswerKey(binaryKey));
+        } catch (e: any) {
+            setExpectedHexKey(""); // Invalid internal input -- shouldn't happen but let player continue to show error at compare step
+            console.log("Error: Invalid pre-compute on internal input");
+        }
+    })
 
 
     // --------- Worker Sandbox ---------
