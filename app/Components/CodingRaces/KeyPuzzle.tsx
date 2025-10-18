@@ -1,5 +1,5 @@
 "use client"
-// app/Components/SafePuzzle.tsx
+// app/Components/KeyPuzzle.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -8,88 +8,106 @@ type RunStatus = "idle" | "running" | "success" | "error" | "timeout";
 
 type Props = {
     stage?: Stage;
-    combination?: number;
+    binaryKey?: string;
     timeLimitMs?: number;
     onComplete?: () => void;
 };
 
-// TODO
-// have a ran function to set the code on each attempt
-// we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
-// could make it a little more challenging by saying numbers 0-5 and letters abc and the combination always contains a repeat
-// must cover 000 as string
-// protect if someone tries to print the value and cheat
-// e.g. you've solved the problem but did you cheat.. your code can't break other combinations... test it with 4 more random
-// 3 digit combinations before unlocking the next stage.
+function generateRandomBinaryString(length = 48): string {
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += Math.random() > 0.5 ? "1" : "0";
+        if ((i + 1) % 4 === 0 && i < length - 1) result += " ";
+    }
+    return result;
+}
 
+// TODO
+// we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
+// set a minimum length etc
+// add a answer page for testing
 
 // Most basic example without extended conditions above
 /*
-// TBC
+//TBC
 function convertToHex(bin) {
-
-}
-function bruteForce(combination: string) {
-    // ...your code goes here
-    for (let i = 0; i <= 999; i++ {
-        // hint-1 zero-pad to 3 digits if you want to print: i.toString().padStart(3, "0")
-        string code = '';
-        if (i === 0) {
-            code = '000'; // cater to three digits....
-            // also have to cater to leading zeros etc
-        }
-        else {
-            code = i.ToString();
-            // etc, etc
-        }
-        // ----- This block must remain to pass ----
-        if (code === combination) {
-            console.log("You have unlocked the safe");
-            return code;
-        }
-        else {
-            code = ControlCode;
-        }
+    const stripInput = String(bin).replace(/\s+/g, "");
+    if (!stripInput) return "";
+    // check for 01 only
+    if (!/^[01]+$/.test(stripInput)) {
+        throw new Error("Input contains non-binary characters.");
     }
-    // ----- This block must remain to pass ----
+    // handle padding
+    const padded = stripInput.length % 4 === 0
+        ? stripInput
+        : stripInput.padStart(Math.ceil(stripInput.length / 4) * 4, "0");
+        // convert every block to a hex digit
+        let hex = "";
+        for (let i = 0; i < padded.length; i += 4) {
+            const block = padded.slice(i, i + 4);
+            const value = parseInt(block, 2);
+            hex += value.toString(16);
+        }
 
-    return code; // failed
+        return hex.toUpperCase();
 }
  */
 
-const DEFAULT_TEMPLATE = `// -- Safe Game: open the safe to get the door key.
-// Objective: brute-force a 3-digit code (000..999) to unlocks the safe.
-// The 'combination' variable has been set by the game (e.g. 111).
-// Return the correct code before the clock runs out to unlock the safe and move to the next puzzle
-// May the coding Gods have mercy on your soul ---------|||
 
-function bruteForce() {
+
+// --------- Compute Expected Hex Answer ---------
+function computeExpectedHexAnswerKey(binaryKey: string): string {
+    const clean = binaryKey.replace(/\s+/g,"");
+    if (!/^[01]+$/.test(clean)) {
+        throw new Error("Compute Error: binaryKey input contains non-binary characters");
+    }
+    // pad to multiple of 4 chars on the left
+    const padded = clean.length % 4 === 0 ? clean : clean.padStart(Math.ceil(clean.length / 4) * 4, "0");
+    // convert to hex (uppercase) without 0x
+    let hex = "";
+    for (let i = 0; i < padded.length; i += 4)  {
+        const block = padded.slice(i, i + 4);
+        const value = parseInt(block, 2);
+        hex += value.toString(16);
+    }
+    return hex.toUpperCase();
+}
+
+
+// --------- Game Player Instruction and Template ---------
+const DEFAULT_TEMPLATE = `// ==== Key Game: Convert the key code from binary to hex ===
+// You broke into the safe and you now have a key code for the door to escape. Just one 
+// problem, the escape room door keypad is hexadecimal your key is in binary. 
+// Implement convertToHex(bin) to convert the binary key & return UPPERCASE hex STRING (no "0x").
+// --Notes:
+// - \`bin\` may contain spaces - clean if needed
+// - if length isn't a multiple of 4 you may - you may need to adjust the padding 
+// - Return HEX in UPPERCASES with no spaces to unlock the next stage... and be quiet, or you may wake Bert up.
+
+function convertToHex(bin) {
     // ...your code goes here
-    // console.log(...) to print progress
-    // compare your code to the variable 'combination' e.g. if (code === combination) {
-    // return the correct code when found
+    // return "...";
 }
 `;
 
-export default function SafePuzzle({
-    // Updated for AppRouter implementation
+export default function KeyPuzzle({
     stage: stageProp,
-    combination = 488, // needs to be random later
-    timeLimitMs = 3000, // worker method hard timeout
+    //binaryKey = "1010 0111 0010 1111 1100 1001 0001 1010  1111 0001 0010 1010", // needs to be random later
+    //binaryKey = generateRandomBinaryString(48), // refactored
+    binaryKey, // refactored again
+    timeLimitMs = 5000, // worker method hard timeout
     onComplete,
 } : Props ) {
-
-    //const stage = (props.stage ?? "safe") as Stage; // fallback code to remove if we're including router params later
-    //const combination = props.combination ?? 488; // Safe combo ** This needs to be randomly generated eventually
-    //const timeLimitMs = props.timeLimitMs ?? 3000; // worker method hard timeout
+    // refactored binaryKeyGen
+    const [randomKey, setRandomKey] = useState<string>(() => generateRandomBinaryString(48));
+    const finalBinaryKey = binaryKey ?? randomKey;
+    // existing
     const params = useParams() as { stage?: Stage };
-    const stage = (params?.stage ?? stageProp ?? "safe") as Stage;
+    const stage = (params?.stage ?? stageProp ?? "key") as Stage;
 
     // --------- Timer ---------
     const [elapsedMs, setElapsedMs] = useState(0);
     const [timerRunning, setTimerRunning] = useState(false);
-    //const timerRef = useRef<number | null>(null);
-    //const tickRef = useRef<number | null>(null);
     const hardTimeoutRef = useRef<number | null>(null);
     const tickRef = useRef<number | null>(null);
 
@@ -117,8 +135,6 @@ export default function SafePuzzle({
 
     useEffect(() => {
         return () => {
-            //if (tickRef.current != null) window.clearInterval(tickRef.current);
-            //if (timerRef.current != null) window.clearTimeout(timerRef.current);
             if (tickRef.current != null) window.clearInterval(tickRef.current);
             if (hardTimeoutRef.current != null) window.clearTimeout(hardTimeoutRef.current);
         };
@@ -128,29 +144,41 @@ export default function SafePuzzle({
     const [code, setCode] = useState(DEFAULT_TEMPLATE); // gets the template code
     const [status, setStatus] = useState<RunStatus>("idle");
     const [output, setOutput] = useState<string>("(terminal ready)\n");
-    const [result, setResult] = useState<number | null>(null);
+    // const [result, setResult] = useState<number | null>(null);
+
+    // Calculate expected and don't show to user
+    const [expectedHexKey, setExpectedHexKey] = useState<string>("");
+    useEffect(() => {
+        try {
+            //setExpectedHexKey(computeExpectedHexAnswerKey(binaryKey));
+            setExpectedHexKey(computeExpectedHexAnswerKey(finalBinaryKey));
+        } catch (e: any) {
+            setExpectedHexKey(""); // Invalid internal input -- shouldn't happen but let player continue to show error at compare step
+            console.log("Logic Error: Invalid pre-compute on internal input");
+        }
+    //}, [binaryKey]);
+    }, [finalBinaryKey]);
 
 
     // --------- Worker Sandbox ---------
     const workerUrl = useMemo(() => {
         // Build a mini worker
-        // - can input the code and combination
-        // - use it to captuer the console output
-        // - executes the code.
+        // - mostly retains same structure as Safe Puzzle implementation
+        // - ideally parametise the structure on reusable parts
 
         const workerSource = `
             self.onmessage = (evt) => {
-            const { code, combination } = evt.data || {};
+            const { code, binaryKey } = evt.data || {};  // Modified variables
             const send = (m) => self.postMessage(m);
             const console = { log: (...args) => send({ type: "log", data: args.map(String).join(" ") }) };
 
             try {
                 const wrapped = new Function(
-                    "combination",
+                    "binaryKey", // Modified variable / label
                     "console",
-                    code + "\\n; return (typeof bruteForce === 'function') ? bruteForce() : (function(){ throw new Error('No bruteForce() function found'); })();"
+                    code + "\\n; if (typeof convertToHex !== 'function') { throw new Error ('No convertToHex(bin) function found'); } return convertToHex(binaryKey);"
                 );
-                const result = wrapped(combination, console);
+                const result = wrapped(binaryKey, console);
                 send({ type: "done", result });
             } catch (err) {
                 send({ type: "error", error: String(err && err.message ? err.message : err) });
@@ -165,19 +193,13 @@ export default function SafePuzzle({
         // reset terminal + state
         setOutput("(running...)\n");
         setStatus("running");
-        setResult(null);
+        //setResult(null);
 
         // Start manual time if not running
         if (!timerRunning) startTimer();
 
         const worker = new Worker(workerUrl);
 
-        /*
-        const cleanup = (finalStatus: RunStatus) => {
-            worker.terminate();
-            setStatus(finalStatus);
-        };
-         */
         const cleanup = (finalStatus: RunStatus) => {
             if (hardTimeoutRef.current != null) {
                 window.clearTimeout(hardTimeoutRef.current);
@@ -185,9 +207,7 @@ export default function SafePuzzle({
             }
             worker.terminate();
             setStatus(finalStatus);
-            if (finalStatus === "success") {
-                pauseTimer();
-            }
+            if (finalStatus === "success") pauseTimer();
         };
 
         worker.onmessage = (e) => {
@@ -195,17 +215,24 @@ export default function SafePuzzle({
             if (msg.type === "log") {
                 setOutput((prev) => prev + msg.data + "\n");
             } else if (msg.type === "done") {
-                const val = Number(msg.result);
-                setResult(val);
-                if (val === combination) {
-                    setOutput((prev) => prev + `✅ Correct code: ${val}\n`);
-                    // Mark the stage as solved for safe -- Escape Room Menu
+                const val = String(msg.result ?? "");
+                // Comparison happens in main thread to avoid exposing expected value/logic in player view
+                if (!expectedHexKey) {
+                    setOutput((prev) => prev + `💥 Logic Error: expected value not correctly set.\n`);
+                    cleanup("error");
+                    return;
+                }
+                // Clean player output (remove spaces, set uppercase
+                const normalised = val.replace(/\s+/g, "").toUpperCase();
+                if (normalised === expectedHexKey) {
+                    setOutput((prev) => prev + `✅ Correct code. Door key recoded to HEX. Nice!\n`);
+                    //localStorage.setItem("escapeRoomSolvedStage", "key");
                     localStorage.setItem("escapeRoomSolvedStage", stage);
                     onComplete?.();
                     cleanup("success");
-                    //pauseTimer();
                 } else {
-                    setOutput((prev) => prev + `❌ Returned ${val}: expected ${combination}\n`);
+                    setOutput((prev) => prev + `❌ Answer is no good. Returned ${val}: expected ${expectedHexKey}\n`);
+                    cleanup("error");
                 }
             } else if (msg.type === "error") {
                 setOutput((prev) => prev + `💥 Error: ${msg.error}\n`);
@@ -213,27 +240,17 @@ export default function SafePuzzle({
             }
         };
 
-
         // Hard timeout (to prevent any inifinite looping)
-        // Refactored
-        /*
-        timerRef.current = window.setTimeout(() => {
-            setOutput((prev) => prev + "⏱️ Timed out.\n");
-            cleanup("timeout");
-        }, timeLimitMs) as unknown as number;
-         */
         hardTimeoutRef.current = window.setTimeout(() => {
             setOutput((prev) => prev + "⏱️ Timed out.\n");
             cleanup("timeout");
         }, timeLimitMs) as unknown as number;
 
-
-
         // Kick off run
-        worker.postMessage({ code, combination });
+        worker.postMessage({ code, binaryKey: finalBinaryKey });
     };
 
-    // --------- UI ---------
+    // --------- UI helper calcs ---------
     const hhmmss = (ms: number) => {
         const s = Math.floor(ms / 1000);
         const h = Math.floor(s / 3600);
@@ -253,7 +270,7 @@ export default function SafePuzzle({
                     <div>
                         <h1 className="text-xl sm:text-2xl font-semibold">Coding Races - {stage.toUpperCase()} Stage</h1>
                         <p className="text-xs opacity-70">
-                            Write code that finds the 3-digit combo. Preset <code>combination</code> is available to your code.
+                            Write the code that converts the binary door key to an uppercase HEX key as a string (no spaces, no "0x").
                         </p>
                     </div>
 
@@ -283,10 +300,11 @@ export default function SafePuzzle({
                         <div className="flex items-center justify-between mb-2">
                             <h2 className="text-sm font-medium">Editor</h2>
                             <div className="flex items-center gap-2 text-xs">
-                                <span className="opacity-70">Combination:</span>
-                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{combination}</span>
+                                <span className="opacity-70">Binary Key:</span>
+                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{finalBinaryKey}</span>
                             </div>
                         </div>
+
                         <textarea
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
@@ -298,7 +316,13 @@ export default function SafePuzzle({
                                 Run
                             </button>
                             <button
-                                onClick={() => setCode(DEFAULT_TEMPLATE)}
+                                onClick={() => {
+                                    setCode(DEFAULT_TEMPLATE)
+                                    setRandomKey(generateRandomBinaryString(48));
+                                    setOutput("(terminal ready)\n");
+                                    setStatus("idle");
+                                    setElapsedMs(0);
+                                }}
                                 className="px-3 py-1 rounded bg-zinc-800 border-zinc-700 hover:bg-zinc-700"
                             >
                                 Reset Template
@@ -332,7 +356,7 @@ export default function SafePuzzle({
                         </pre>
                         {status === "success" && (
                             <div className="mt-2 text-xs text-emerald-300">
-                                Progress saved. Return to escape room to find your next puzzle.
+                                Hex accepted. Progress saved. Return to escape room to find your next puzzle.
                             </div>
                         )}
                     </div>
@@ -343,10 +367,11 @@ export default function SafePuzzle({
                     <details>
                         <summary className="cursor-pointer font medium">Hints</summary>
                         <ul className="list-disc ml-6 space-y-1">
-                            <li>The variable <code>combination</code> is a number like <code>4aa</code>.</li>
-                            <li>Define a function <code>bruteforce()</code> that returns the correct safe code.</li>
-                            <li>Loop from <code>0</code> to <code>999</code> amd compare each value with the <code>combination</code>.</li>
-                            <li>You can emit logs with <code>console.log()</code> - they'll appear in the terminal.</li>
+                            <li>Remove spaces from the input.</li>
+                            <li>If the length isn't a multiple of 4, decide how to handle the left-padding with zeros.</li>
+                            <li>Convert groups of 4 bits to a single hex digit (0-F).</li>
+                            <li>Return an UPPERCASE hex string with no spaces, no "0x".</li>
+                            <li>Your code will be tested against different inputs, it should be capable of converting any provided binary.</li>
                         </ul>
                     </details>
                 </div>
