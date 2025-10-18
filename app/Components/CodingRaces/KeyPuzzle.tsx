@@ -316,7 +316,13 @@ export default function KeyPuzzle({
                                 Run
                             </button>
                             <button
-                                onClick={() => setCode(DEFAULT_TEMPLATE)}
+                                onClick={() => {
+                                    setCode(DEFAULT_TEMPLATE)
+                                    setRandomKey(generateRandomBinaryString(48));
+                                    setOutput("(terminal ready)\n");
+                                    setStatus("idle");
+                                    setElapsedMs(0);
+                                }}
                                 className="px-3 py-1 rounded bg-zinc-800 border-zinc-700 hover:bg-zinc-700"
                             >
                                 Reset Template
