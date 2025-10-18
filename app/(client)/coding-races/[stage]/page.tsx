@@ -31,8 +31,16 @@ export default function CodingRacesRoute() {
         case "safe":
             return <SafePuzzle {...commonProps} />;
         case "key":
-            return <KeyPuzzle  {...commonProps} />;
-  /*      case "door":
+            return <KeyPuzzle
+                timeLimitMs={6000}
+                {...commonProps} />;
+  /*    // key refactored to allow for random generation
+        case "key":
+            return <KeyPuzzle
+                binaryKey="1011 0100 1110 1111  1001 1101 0010 0110  0001 1110 1011 0111"
+                timeLimitMs={6000}
+                {...commonProps} />;
+        case "door":
             return <DoorPuzzle  {...commonProps} />; */
         default:
             notFound();

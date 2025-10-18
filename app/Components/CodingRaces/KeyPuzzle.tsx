@@ -13,22 +13,51 @@ type Props = {
     onComplete?: () => void;
 };
 
+function generateRandomBinaryString(length = 48): string {
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += Math.random() > 0.5 ? "1" : "0";
+        if ((i + 1) % 4 === 0 && i < length - 1) result += " ";
+    }
+    return result;
+}
+
 // TODO
-// have a ran function to set the binaryKey on each attempt (then compute the hex key but not reveal it to the user)
 // we want a minimum timer on this one as it can't expire any sooner than it takes to run all the combinations
 // set a minimum length etc
+// add a answer page for testing
 
 // Most basic example without extended conditions above
 /*
 //TBC
 function convertToHex(bin) {
+    const stripInput = String(bin).replace(/\s+/g, "");
+    if (!stripInput) return "";
+    // check for 01 only
+    if (!/^[01]+$/.test(stripInput)) {
+        throw new Error("Input contains non-binary characters.");
+    }
+    // handle padding
+    const padded = stripInput.length % 4 === 0
+        ? stripInput
+        : stripInput.padStart(Math.ceil(stripInput.length / 4) * 4, "0");
+        // convert every block to a hex digit
+        let hex = "";
+        for (let i = 0; i < padded.length; i += 4) {
+            const block = padded.slice(i, i + 4);
+            const value = parseInt(block, 2);
+            hex += value.toString(16);
+        }
 
+        return hex.toUpperCase();
 }
  */
 
+
+
 // --------- Compute Expected Hex Answer ---------
-function computeExoectedHexAnswerKey(binaryKey: string): string {
-    const clean = binaryKey.replace(/\+/g,"");
+function computeExpectedHexAnswerKey(binaryKey: string): string {
+    const clean = binaryKey.replace(/\s+/g,"");
     if (!/^[01]+$/.test(clean)) {
         throw new Error("Compute Error: binaryKey input contains non-binary characters");
     }
@@ -63,13 +92,18 @@ function convertToHex(bin) {
 
 export default function KeyPuzzle({
     stage: stageProp,
-    binaryKey = "1010 0111 0010 1111 1100 1001 0001 1010  1111 0001 0010 1010", // needs to be random later
+    //binaryKey = "1010 0111 0010 1111 1100 1001 0001 1010  1111 0001 0010 1010", // needs to be random later
+    //binaryKey = generateRandomBinaryString(48), // refactored
+    binaryKey, // refactored again
     timeLimitMs = 5000, // worker method hard timeout
     onComplete,
 } : Props ) {
-
+    // refactored binaryKeyGen
+    const [randomKey, setRandomKey] = useState<string>(() => generateRandomBinaryString(48));
+    const finalBinaryKey = binaryKey ?? randomKey;
+    // existing
     const params = useParams() as { stage?: Stage };
-    const stage = (params?.stage ?? stageProp ?? "safe") as Stage;
+    const stage = (params?.stage ?? stageProp ?? "key") as Stage;
 
     // --------- Timer ---------
     const [elapsedMs, setElapsedMs] = useState(0);
@@ -116,12 +150,14 @@ export default function KeyPuzzle({
     const [expectedHexKey, setExpectedHexKey] = useState<string>("");
     useEffect(() => {
         try {
-            setExpectedHexKey(computeExoectedHexAnswerKey(binaryKey));
+            //setExpectedHexKey(computeExpectedHexAnswerKey(binaryKey));
+            setExpectedHexKey(computeExpectedHexAnswerKey(finalBinaryKey));
         } catch (e: any) {
             setExpectedHexKey(""); // Invalid internal input -- shouldn't happen but let player continue to show error at compare step
             console.log("Logic Error: Invalid pre-compute on internal input");
         }
-    }, [binaryKey]);
+    //}, [binaryKey]);
+    }, [finalBinaryKey]);
 
 
     // --------- Worker Sandbox ---------
@@ -140,7 +176,7 @@ export default function KeyPuzzle({
                 const wrapped = new Function(
                     "binaryKey", // Modified variable / label
                     "console",
-                    code + "\\n; return (typeof convertToHex !== 'function') { throw new Error ('No convertToHex(bin) function found'); } return convertToHex(binaryKey);"
+                    code + "\\n; if (typeof convertToHex !== 'function') { throw new Error ('No convertToHex(bin) function found'); } return convertToHex(binaryKey);"
                 );
                 const result = wrapped(binaryKey, console);
                 send({ type: "done", result });
@@ -211,7 +247,7 @@ export default function KeyPuzzle({
         }, timeLimitMs) as unknown as number;
 
         // Kick off run
-        worker.postMessage({ code, binaryKey });
+        worker.postMessage({ code, binaryKey: finalBinaryKey });
     };
 
     // --------- UI helper calcs ---------
@@ -265,7 +301,7 @@ export default function KeyPuzzle({
                             <h2 className="text-sm font-medium">Editor</h2>
                             <div className="flex items-center gap-2 text-xs">
                                 <span className="opacity-70">Binary Key:</span>
-                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{binaryKey}</span>
+                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{finalBinaryKey}</span>
                             </div>
                         </div>
 
@@ -325,10 +361,11 @@ export default function KeyPuzzle({
                     <details>
                         <summary className="cursor-pointer font medium">Hints</summary>
                         <ul className="list-disc ml-6 space-y-1">
-                            <li>The variable <code>combination</code> is a number like <code>4aa</code>.</li>
-                            <li>Define a function <code>bruteforce()</code> that returns the correct safe code.</li>
-                            <li>Loop from <code>0</code> to <code>999</code> amd compare each value with the <code>combination</code>.</li>
-                            <li>You can emit logs with <code>console.log()</code> - they'll appear in the terminal.</li>
+                            <li>Remove spaces from the input.</li>
+                            <li>If the length isn't a multiple of 4, decide how to handle the left-padding with zeros.</li>
+                            <li>Convert groups of 4 bits to a single hex digit (0-F).</li>
+                            <li>Return an UPPERCASE hex string with no spaces, no "0x".</li>
+                            <li>Your code will be tested against different inputs, it should be capable of converting any provided binary.</li>
                         </ul>
                     </details>
                 </div>
