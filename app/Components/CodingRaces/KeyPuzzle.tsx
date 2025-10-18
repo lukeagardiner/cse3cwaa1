@@ -119,7 +119,7 @@ export default function KeyPuzzle({
             setExpectedHexKey(computeExoectedHexAnswerKey(binaryKey));
         } catch (e: any) {
             setExpectedHexKey(""); // Invalid internal input -- shouldn't happen but let player continue to show error at compare step
-            console.log("Error: Invalid pre-compute on internal input");
+            console.log("Logic Error: Invalid pre-compute on internal input");
         }
     }, [binaryKey]);
 
@@ -157,19 +157,13 @@ export default function KeyPuzzle({
         // reset terminal + state
         setOutput("(running...)\n");
         setStatus("running");
-        setResult(null);
+        //setResult(null);
 
         // Start manual time if not running
         if (!timerRunning) startTimer();
 
         const worker = new Worker(workerUrl);
 
-        /*
-        const cleanup = (finalStatus: RunStatus) => {
-            worker.terminate();
-            setStatus(finalStatus);
-        };
-         */
         const cleanup = (finalStatus: RunStatus) => {
             if (hardTimeoutRef.current != null) {
                 window.clearTimeout(hardTimeoutRef.current);
@@ -177,9 +171,7 @@ export default function KeyPuzzle({
             }
             worker.terminate();
             setStatus(finalStatus);
-            if (finalStatus === "success") {
-                pauseTimer();
-            }
+            if (finalStatus === "success") pauseTimer();
         };
 
         worker.onmessage = (e) => {
@@ -187,17 +179,24 @@ export default function KeyPuzzle({
             if (msg.type === "log") {
                 setOutput((prev) => prev + msg.data + "\n");
             } else if (msg.type === "done") {
-                const val = Number(msg.result);
-                setResult(val);
-                if (val === combination) {
-                    setOutput((prev) => prev + `✅ Correct code: ${val}\n`);
-                    // Mark the stage as solved for safe -- Escape Room Menu
+                const val = String(msg.result ?? "");
+                // Comparison happens in main thread to avoid exposing expected value/logic in player view
+                if (!expectedHexKey) {
+                    setOutput((prev) => prev + `💥 Logic Error: expected value not correctly set.\n`);
+                    cleanup("error");
+                    return;
+                }
+                // Clean player output (remove spaces, set uppercase
+                const normalised = val.replace(/\s+/g, "").toUpperCase();
+                if (normalised === expectedHexKey) {
+                    setOutput((prev) => prev + `✅ Correct code. Door key recoded to HEX. Nice!\n`);
+                    //localStorage.setItem("escapeRoomSolvedStage", "key");
                     localStorage.setItem("escapeRoomSolvedStage", stage);
                     onComplete?.();
                     cleanup("success");
-                    //pauseTimer();
                 } else {
-                    setOutput((prev) => prev + `❌ Returned ${val}: expected ${combination}\n`);
+                    setOutput((prev) => prev + `❌ Answer is no good. Returned ${val}: expected ${expectedHexKey}\n`);
+                    cleanup("error");
                 }
             } else if (msg.type === "error") {
                 setOutput((prev) => prev + `💥 Error: ${msg.error}\n`);
@@ -205,27 +204,17 @@ export default function KeyPuzzle({
             }
         };
 
-
         // Hard timeout (to prevent any inifinite looping)
-        // Refactored
-        /*
-        timerRef.current = window.setTimeout(() => {
-            setOutput((prev) => prev + "⏱️ Timed out.\n");
-            cleanup("timeout");
-        }, timeLimitMs) as unknown as number;
-         */
         hardTimeoutRef.current = window.setTimeout(() => {
             setOutput((prev) => prev + "⏱️ Timed out.\n");
             cleanup("timeout");
         }, timeLimitMs) as unknown as number;
 
-
-
         // Kick off run
-        worker.postMessage({ code, combination });
+        worker.postMessage({ code, binaryKey });
     };
 
-    // --------- UI ---------
+    // --------- UI helper calcs ---------
     const hhmmss = (ms: number) => {
         const s = Math.floor(ms / 1000);
         const h = Math.floor(s / 3600);
@@ -245,7 +234,7 @@ export default function KeyPuzzle({
                     <div>
                         <h1 className="text-xl sm:text-2xl font-semibold">Coding Races - {stage.toUpperCase()} Stage</h1>
                         <p className="text-xs opacity-70">
-                            Write code that finds the 3-digit combo. Preset <code>combination</code> is available to your code.
+                            Write the code that converts the binary door key to an uppercase HEX key as a string (no spaces, no "0x").
                         </p>
                     </div>
 
@@ -275,10 +264,11 @@ export default function KeyPuzzle({
                         <div className="flex items-center justify-between mb-2">
                             <h2 className="text-sm font-medium">Editor</h2>
                             <div className="flex items-center gap-2 text-xs">
-                                <span className="opacity-70">Combination:</span>
-                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{combination}</span>
+                                <span className="opacity-70">Binary Key:</span>
+                                <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">{binaryKey}</span>
                             </div>
                         </div>
+
                         <textarea
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
@@ -324,7 +314,7 @@ export default function KeyPuzzle({
                         </pre>
                         {status === "success" && (
                             <div className="mt-2 text-xs text-emerald-300">
-                                Progress saved. Return to escape room to find your next puzzle.
+                                Hex accepted. Progress saved. Return to escape room to find your next puzzle.
                             </div>
                         )}
                     </div>
