@@ -32,7 +32,7 @@ const HeaderFooter = ({ children } : HeaderFooterProps) => {
                 {/* Header - Title Content */}
                 <div className={styles.headerContent}>
                     <div className={styles.headerContainer}>
-                        <h1 className={styles.title}>CSE3CWA - Assessment 1</h1>
+                        <h1 className={styles.title}>CSE3CWA - Assessment 2</h1>
                         <span className={styles.studentId}>20219568</span>
                     </div>
                     <div className={styles.headerDivider}></div>

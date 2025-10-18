@@ -48,6 +48,22 @@ export default function EscapeRoom() {
     const [progress, setProgress] = useState<Progress>({safe: false, key: false, door: false});
     const [saving, setSaving] = useState<boolean>(false);
 
+    // Hotspot refactoring - contol conditional hostpots
+    /*
+    const hotspotOffsetData = {
+
+        safeSolved: { safe: { x: 0, y: 0}},
+        keySolved: { key: { x: 0, y: 0}},
+        doorSolved: { door: { x: 0, y: 0}},
+    }
+    */
+    const hotspotOffsetData: Partial<
+        Record<BgState, Partial<Record<Stage, {x: number; y: number }>>>
+    > = {
+        safeSolved: { key: { x: 240, y: 0}, door: { x: -400, y: -100}},
+        keySolved: { door: { x: -200, y: 0}},
+        doorSolved: { door: { x: 0, y: 0}},
+    }
 
     // ########## Progress persistence helpers ##########
     const LS_KEY = "escaperRoomProgress"; // LocalStorageKey
@@ -246,6 +262,12 @@ export default function EscapeRoom() {
 
                     {zones.map((z) => {
                         const enabled = z.stage ? canBegin(z.stage) : true;
+
+                        // interrogate current background state and apply an offset
+                        // needs to unpack bgState -> zone id -> offset
+                        const zoneOffset =
+                            (z.stage && hotspotOffsetData[bgState]?.[z.stage] || { x: 0, y: 0 });
+
                         return (
                             <button
                                 key={z.id}
@@ -257,8 +279,9 @@ export default function EscapeRoom() {
                                     "group absolute focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed"
                                 }
                                 style={{
-                                    left: `${z.left}%`,
-                                    top: `${z.top}%`,
+                                    // Refactor - add in the offsets
+                                    left: `calc(${z.left}% + ${zoneOffset.x}px)`,
+                                    top: `calc(${z.top}% + ${zoneOffset.y}px)`,
                                     width: `${z.width}%`,
                                     height: `${z.height}%`,
                                     cursor: enabled ? "pointer" : "not-allowed",
