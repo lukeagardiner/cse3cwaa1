@@ -121,29 +121,28 @@ export default function KeyPuzzle({
             setExpectedHexKey(""); // Invalid internal input -- shouldn't happen but let player continue to show error at compare step
             console.log("Error: Invalid pre-compute on internal input");
         }
-    })
+    }, [binaryKey]);
 
 
     // --------- Worker Sandbox ---------
     const workerUrl = useMemo(() => {
         // Build a mini worker
-        // - can input the code and combination
-        // - use it to captuer the console output
-        // - executes the code.
+        // - mostly retains same structure as Safe Puzzle implementation
+        // - ideally parametise the structure on reusable parts
 
         const workerSource = `
             self.onmessage = (evt) => {
-            const { code, combination } = evt.data || {};
+            const { code, binaryKey } = evt.data || {};  // Modified variables
             const send = (m) => self.postMessage(m);
             const console = { log: (...args) => send({ type: "log", data: args.map(String).join(" ") }) };
 
             try {
                 const wrapped = new Function(
-                    "combination",
+                    "binaryKey", // Modified variable / label
                     "console",
-                    code + "\\n; return (typeof bruteForce === 'function') ? bruteForce() : (function(){ throw new Error('No bruteForce() function found'); })();"
+                    code + "\\n; return (typeof convertToHex !== 'function') { throw new Error ('No convertToHex(bin) function found'); } return convertToHex(binaryKey);"
                 );
-                const result = wrapped(combination, console);
+                const result = wrapped(binaryKey, console);
                 send({ type: "done", result });
             } catch (err) {
                 send({ type: "error", error: String(err && err.message ? err.message : err) });
