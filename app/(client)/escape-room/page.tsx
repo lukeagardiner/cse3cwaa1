@@ -44,19 +44,15 @@ export default function EscapeRoom() {
     // Variables also used in game stage management
     const [bgState, setBgState] = useState<BgState>("base");
     const [debugMode, setDebugMode] = useState(false);
-    const [playerId, setPlayerId] = useState<string>(""); // Allows for any future type rn
+    //const [playerId, setPlayerId] = useState<string>(""); // Allows for any future type rn
+    const [playerId, setPlayerId] = useState("");
     const [progress, setProgress] = useState<Progress>({safe: false, key: false, door: false});
-    const [saving, setSaving] = useState<boolean>(false);
+    //const [saving, setSaving] = useState<boolean>(false);
+    const [saving, setSaving] = useState(false);
+    const [loadingDB, setLoadingDB] = useState(false);
+    const [password, setPassword] = useState("");
 
     // Hotspot refactoring - contol conditional hostpots
-    /*
-    const hotspotOffsetData = {
-
-        safeSolved: { safe: { x: 0, y: 0}},
-        keySolved: { key: { x: 0, y: 0}},
-        doorSolved: { door: { x: 0, y: 0}},
-    }
-    */
     const hotspotOffsetData: Partial<
         Record<BgState, Partial<Record<Stage, {x: number; y: number }>>>
     > = {
@@ -147,28 +143,28 @@ export default function EscapeRoom() {
         return () => window.removeEventListener("storage", onStorage);
     }, [loadProgress, markSolved]);
 
-    // ########## DB Save will eventually get called here via API ##########
+    // ########## Refactored for DB save hooked up to API function ##########
     async function saveProgressLogic() {
         try {
             setSaving(true);
-            // TODO
-            // -- Insert API endpoint and auth handling
-            // POST BODY PLACEHOLDER ONLY
-            // May need to handle guest sessions etc...
-            // Consider using tokenised session logic like in previous app
-            const payload = {
-                playerId: playerId || undefined,
-                progress,
-            };
-            // const res = await fetch("/api/progress/save", {
-            //   method: "POST",
-            //   headers: { "Content-Type": "apllication/json" },
-            //   body: JSON.stringify(payload),
-            // });
-            // if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            // const json = await res.json();
-            console.log("mock) saving player progress session to DB storage: ", payload);
-            alert("Progress saved (mock). Replace with real API call.");
+
+            const res = await fetch("/api/player/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    playerId,
+                    password,
+                    progress,
+                }),
+            });
+
+            const data = await res.json(); // handles the call result
+            if (!res.ok) {
+                alert(data?.error ?? "Save failed (.");
+                return;
+            }
+
+            alert("Progress saved successfully!");
         } catch (err: any) {
             console.error(err)
             alert("Porgress failed to save. See output log for error detail.");
@@ -177,34 +173,45 @@ export default function EscapeRoom() {
         }
     }
 
-    // Clickable zones (based on percentages for scaling / responsiveness)
-    // Need to come back to these to do some edits
-    // Add disable state and tool tips to manage progress...
-    // Original
-    /*
-    const zones: Array<{
-        id: "safe" | "key" | "doors";
-        label: string;
-        // percentages [0..100]
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-        onClick: () => void;
-    }> = [{
-        id: "safe",
-        label: "Safe (Combination Game)",
-        left: 3,
-        top: 45,
-        width: 22,
-        height: 35,
-        onClick: () => setBgState((s) => ( s === "base" ? "safeSolved" : s))
-    },
-    {
+    // ------ load progress from db on login and overwrite local storage -----
+    async function loadProgressFromDB() {
+        if (!playerId || !password) {
+            alert("enter player id and password first");
+            return;
+        }
+        try {
+            setLoadingDB(true);
+            const res = await fetch(`/api/player/progress?playerId=${encodeURIComponent(playerId)}&password=${encodeURIComponent(password)}`);
 
+        // Auth case responses
+            if (res.status === 404) {
+                alert("could not load progress - make sure the provided credentials exist or add credentials to create new user first");
+                return;
+            }
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert(data?.error ?? "could not load progress - storage access error");
+                return;
+            }
+
+            const data = await res.json();
+            if (data?.success && data?.progress) {
+                // Trigger a write of the db data to local storage and auto-adjust bgState utelising the existing logics
+                persistProgress({
+                    safe: !!data.progress.safe,
+                    key: !!data.progress.score,
+                    door: !!data.progress.door,
+                });
+                alert("Last play progress loaded form server.");
+            } else {
+                alert("No saved progress found for this player.");
+            }
+        } finally {
+            setLoadingDB(false);
+        }
     }
-    ]
-    */
+
+    // ########## Screen clickable zone management ##########
     // Refactor
     const zones: Array<{
         id: Stage | "keys" | "doors";
@@ -359,23 +366,29 @@ export default function EscapeRoom() {
                                 placeholder="Player Id / Email"
                                 className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
                             />
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="enter-password"
+                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
+                            />
                             <button
                                 onClick={saveProgressLogic}
                                 className="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 disabled:opacity-60"
-                                disabled={saving}
+                                disabled={saving || !playerId || !password}
                             >
-                                {saving ? "Saving..." : "Save Progress"}
+                                {saving ? "Saving..." : "Register user / Save Progress"}
                             </button>
+                            <button
+                                onClick={loadProgressFromDB}
+                                className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-60"
+                                disabled={loadingDB || !playerId || !password}
+                            >
+                                {loadingDB ? "Loading..." : "Loading registered user progress from server storage"}
+                            </button>
+
                         </div>
-                        { /*
-                        <p className="mt-4 text-xs opacity-70">
-                            Add for React Router :
-                            call <code>navigate(`/coding-races/${"safe" | "key" | "door"}`)</code> inside <code>beginStage()</code>.
-                            After a puzzle is solved, set
-                            <code>localStorage.setItem("escapeRoomSolvedStage", stage)</code> in the Coding Races Page
-                            so this menu updates automatically.
-                        </p>
-                        */ }
                     </div>
                 </div>
             </div>
