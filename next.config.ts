@@ -4,45 +4,22 @@ const isDev = process.env.NODE_ENV === 'development';
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-    // External packages that shouldn't be bundled
     serverExternalPackages: ['sequelize', 'sqlite3', 'bcrypt'],
-
-    // Webpack customization with proper typing
-    webpack: (config, context) => {
-        const { isServer } = context;
-
+    reactStrictMode: true,
+    poweredByHeader: false,
+    compress: true,
+    webpack: (config, { isServer }) => {
         if (isServer) {
-            // Development-only: more detailed logging
-            if (isDev) {
-                config.stats = 'verbose';
-            }
-
-            // Externalize native Node.js modules
-            config.externals = config.externals || [];
-
-            if (Array.isArray(config.externals)) {
-                config.externals.push({
-                    'sqlite3': 'commonjs sqlite3',
-                    'sequelize': 'commonjs sequelize',
-                    'bcrypt': 'commonjs bcrypt',
-                });
-            }
-
-            // Enable Node.js built-ins
+            config.externals = [
+                ...(Array.isArray(config.externals) ? config.externals : []),
+                { sqlite3: 'commonjs sqlite3', sequelize: 'commonjs sequelize', bcrypt: 'commonjs bcrypt' },
+            ];
             config.externalsPresets = { node: true };
+            config.ignoreWarnings = [
+                { module: /node_modules\/sequelize\/lib/ },
+                /Critical dependency: the request of a dependency is an expression/,
+            ];
         }
-
-        // Production optimizations
-        if (isProd && config.optimization) {
-            config.optimization.minimize = true;
-        }
-
-        // Suppress known Sequelize warnings
-        config.ignoreWarnings = [
-            { module: /node_modules\/sequelize\/lib/ },
-            /Critical dependency: the request of a dependency is an expression/,
-        ];
-
         return config;
     },
 
@@ -55,14 +32,6 @@ const nextConfig: NextConfig = {
         }
         : undefined,
 
-    // React optimizations
-    reactStrictMode: true,
-
-    // Security headers
-    poweredByHeader: false,
-
-    // Compression
-    compress: true,
 };
 
 export default nextConfig;
