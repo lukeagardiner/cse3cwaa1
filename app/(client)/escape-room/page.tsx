@@ -41,7 +41,7 @@ export default function EscapeRoom() {
         doorSolved: "/images/escape-room/doorsolved.png",
     }), []);
 
-    // Variables also used in game stage management
+    // Hooks used in stage management
     const [bgState, setBgState] = useState<BgState>("base");
     const [debugMode, setDebugMode] = useState(false);
     //const [playerId, setPlayerId] = useState<string>(""); // Allows for any future type rn
@@ -51,6 +51,8 @@ export default function EscapeRoom() {
     const [saving, setSaving] = useState(false);
     const [loadingDB, setLoadingDB] = useState(false);
     const [password, setPassword] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const [actionMessage, setActionMessage] = useState("");
 
     // Hotspot refactoring - contol conditional hostpots
     const hotspotOffsetData: Partial<
@@ -181,20 +183,27 @@ export default function EscapeRoom() {
     async function loadProgressFromDB() {
         if (!playerId || !password) {
             alert("enter player id and password first");
+            // action message update game screen
+            setActionMessage("load failed - use valid credentials");
             return;
         }
         try {
+            // action message update game screen
+            setActionMessage("finding user saved progress...");
             setLoadingDB(true);
             const res = await fetch(`/api/player/progress?playerId=${encodeURIComponent(playerId)}&password=${encodeURIComponent(password)}`);
 
         // Auth case responses
             if (res.status === 404) {
                 alert("could not load progress - make sure the provided credentials exist or add credentials to create new user first");
+                // action message update game screen
+                setActionMessage(`error could not load progress - check credentials...${res.status}`);
                 return;
             }
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 alert(data?.error ?? "could not load progress - storage access error");
+                setActionMessage(`error could not load progress - check credentials...${res.status}`); // user action message update game screen
                 return;
             }
 
@@ -203,12 +212,14 @@ export default function EscapeRoom() {
                 // Trigger a write of the db data to local storage and auto-adjust bgState utelising the existing logics
                 persistProgress({
                     safe: !!data.progress.safe,
-                    key: !!data.progress.score,
+                    key: !!data.progress.key,
                     door: !!data.progress.door,
                 });
                 alert("Last play progress loaded form server.");
+                setActionMessage("loaded game progress from last save point");
             } else {
                 alert("No saved progress found for this player.");
+                setActionMessage("no previous progress found");
             }
         } finally {
             setLoadingDB(false);
@@ -219,11 +230,14 @@ export default function EscapeRoom() {
     async function deleteAccount() {
         if (!playerId || !password) {
             alert("enter player id and password first - then attempt delete");
+            setActionMessage("no account found for deletion - check credentials."); // msg to player screen
             return
         }
 
         if (!confirm("Are you sure you want to delete this account?"))  return;
 
+        // action message update game screent
+        setActionMessage("Delete requested.. Attempting user account deletion");
         try {
             const res = await fetch(`/api/player/delete`, {
                 method: "DELETE",
@@ -234,6 +248,8 @@ export default function EscapeRoom() {
             const data = await res.json();
             if (!res.ok) {
                 alert(data?.error ?? "account deletion failed");
+                // action message update game screen
+                setActionMessage("account deletion did not complete");
                 return;
             }
 
@@ -242,6 +258,8 @@ export default function EscapeRoom() {
             setPlayerId("");
             setPassword("");
             setProgress( { safe: false, key: false, door: false });
+            // action message update game screen
+            setActionMessage("user account deleted");
         } catch (err) {
             console.error(err);
             alert("Error deleting account. See console for details.")
@@ -395,15 +413,16 @@ export default function EscapeRoom() {
                         </div>
                     </div>
                     {/* User Input and Button block */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        { /* input wrapper */ }
-                        <div className="flex flex-col sm:flex-row gap-2 flex-1">
+                    <div className="p-4 rounded-lg border border-zinc-700/80 bg-zinc-900/60">
+                        <h2 className="text-sm font-medium mb-3">Save to Database</h2>
+                        { /* Row 1 inputs */ }
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
                             {/* Username Input */}
                             <input
                                 value={playerId}
                                 onChange={(e) => setPlayerId(e.target.value)}
                                 placeholder="Player Id / Email"
-                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
+                                className="flex-1 min-w-[240px] px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
                             />
                             {/* Username Password Input */}
                             <input
@@ -411,19 +430,18 @@ export default function EscapeRoom() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="enter-password"
-                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
+                                className="flex-1 min-w-[240px] px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
                             />
                         </div>
-
-                        { /* button wrapper */ }
-                        <div className="flex flex-wrap gap-2 justify-end">
+                        { /* Row 2 buttons */ }
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
                             {/* Save Progress - Register New User Combo Button */}
                             <button
                                 onClick={saveProgressLogic}
                                 className="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 disabled:opacity-60"
                                 disabled={saving || !playerId || !password}
                             >
-                                {saving ? "Saving..." : "Register user / Save Progress"}
+                                Register / Save Game
                             </button>
                             {/* load progress from DB */}
                             <button
@@ -431,16 +449,31 @@ export default function EscapeRoom() {
                                 className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-60"
                                 disabled={loadingDB || !playerId || !password}
                             >
-                                {loadingDB ? "Loading..." : "Loading registered user progress from server storage"}
+                                Load Last Save Point
                             </button>
+                        </div>
+
+                        { /* Row 3 buttons */ }
+                        <div className="flex mb-3">
                             {/* delete player account from DB and reset progress */}
                             <button
                                 onClick={deleteAccount}
                                 className="px-3 py-2 rounded bg-red-700 hover:bg-red-600 disabled:opacity-60"
                                 disabled={!playerId || !password}
                             >
-                                Delete Account {"account delete in progress"}
+                                Delete Account
                             </button>
+                        </div>
+
+                        { /* Row 4 status label */ }
+                        <div className="w-full text-center text-xs font-medium text-amber-400 bg-zinc-800/50 border border-zinc-700 rounded p-2">
+                            {saving
+                                ? "Saving... Register user / Save Progress"
+                                : loadingDB
+                                ? "Loading... Loading registered user progress from server storage"
+                                : deleting
+                                ? "...account delete in progress"
+                                : actionMessage || "ready"}
                         </div>
                     </div>
                 </div>
