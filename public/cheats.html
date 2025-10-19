@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex">
+    <title>Escape Room Answers — Dev/Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background: #0a0a0a;
+            color: #eee;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #111827;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+        }
+        h1 { font-size: 22px; margin-bottom: 6px; }
+        h2 { margin-top: 24px; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        pre {
+            background: #0b0b0b;
+            border: 1px solid #333;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .warn {
+            background: #7f1d1d;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        a { color: #93c5fd; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Escape Room Answers (Dev / QA only)</h1>
+    <div class="warn">
+        ⚠ For testing purposes only — remove this file before production deploy.
+    </div>
+
+    <h2>Safe Puzzle</h2>
+    <pre>
+Example Combination: <b>488</b>
+Hint: The sequence is derived from the 3-digit code on the wall safe.
+
+    //AnswerCode:
+    function bruteForce(combination: string) {
+    // ...your code goes here
+    for (let i = 0; i <= 999; i++ {
+        // hint-1 zero-pad to 3 digits if you want to print: i.toString().padStart(3, "0")
+        string code = '';
+        if (i === 0) {
+            code = '000'; // cater to three digits....
+            // also have to cater to leading zeros etc
+        }
+        else {
+            code = i.ToString();
+            // etc, etc
+        }
+        // ----- This block must remain to pass ----
+        if (code === combination) {
+            console.log("You have unlocked the safe");
+            return code;
+        }
+        else {
+            code = ControlCode;
+        }
+    }
+    // ----- This block must remain to pass ----
+
+    return code; // failed
+}
+    </pre>
+
+    <h2>Key Puzzle</h2>
+    <pre>
+Binary example: 1011010011101111 1001110100100110 0001111010110111
+Hex example: B4EF9D26 1EB7  (combined: B4EF9D261EB7)
+
+    //AnswerCode:
+    function convertToHex(bin) {
+        const stripInput = String(bin).replace(/\s+/g, "");
+        if (!stripInput) return "";
+        // check for 01 only
+        if (!/^[01]+$/.test(stripInput)) {
+            throw new Error("Input contains non-binary characters.");
+        }
+        // handle padding
+        const padded = stripInput.length % 4 === 0
+          ? stripInput
+          : stripInput.padStart(Math.ceil(stripInput.length / 4) * 4, "0");
+          // convert every block to a hex digit
+        let hex = "";
+        for (let i = 0; i < padded.length; i += 4) {
+            const block = padded.slice(i, i + 4);
+            const value = parseInt(block, 2);
+            hex += value.toString(16);
+        }
+
+        return hex.toUpperCase();
+    }
+
+
+    </pre>
+
+    <h2>Door Puzzle</h2>
+    <pre>
+Reported (buggy) door: 4
+Correct door (true exit): 2
+Bug reason: the code uses the reported door without verifying actual door metrics.
+Fix: return <code>correctDoor</code> instead of <code>reportedDoor</code>.
+
+
+    //AnswerCode:
+    function pickDoor(doors, reportedDoor) {
+      // OPTIONAL (experimental): your fabricated data — not recommended
+      const doorData = doors.map(d => ({
+        door: d,
+        height: d + 1,
+        width: d + 2,
+      }));
+
+      function findExitDoor() {
+        for (const d of doorData) {
+          const others = doorData.filter(o => o.door !== d.door);
+          const avgArea = others.reduce((sum, o) => sum + o.height * o.width, 0) / others.length;
+          const thisArea = d.height * d.width;
+          if (Math.abs(thisArea - 3 * avgArea) < 0.01) {
+            return d.door;
+          }
+        }
+        return undefined; // IMPORTANT: explicit fallback
+      }
+
+      // ✅ Actually use the computed answer
+      const fixed = findExitDoor();
+
+      // Prefer the engine’s correctDoor if available (most reliable)
+      if (typeof correctDoor !== "undefined") {
+        return Number(correctDoor);
+      }
+
+      // Next best: if your heuristic found something, use it
+      if (typeof fixed === "number") {
+        return fixed;
+      }
+
+      // Last resort: pick any door that isn't the reported one
+      const i = doors.indexOf(reportedDoor);
+      return doors[(i + 1) % doors.length];
+    }
+
+
+    </pre>
+
+    <h2>Notes</h2>
+    <ul>
+        <li>These are static sample answers for testers.</li>
+        <li>Dynamic puzzles regenerate each session — values may differ on each run.</li>
+        <li>File path: <code>/public/answers.html</code></li>
+        <li>Access via <a href="/answers.html">http://localhost:3000/answers.html</a></li>
+    </ul>
+</div>
+</body>
+</html>
