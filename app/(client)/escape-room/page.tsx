@@ -41,22 +41,20 @@ export default function EscapeRoom() {
         doorSolved: "/images/escape-room/doorsolved.png",
     }), []);
 
-    // Variables also used in game stage management
+    // Hooks used in stage management
     const [bgState, setBgState] = useState<BgState>("base");
     const [debugMode, setDebugMode] = useState(false);
-    const [playerId, setPlayerId] = useState<string>(""); // Allows for any future type rn
+    //const [playerId, setPlayerId] = useState<string>(""); // Allows for any future type rn
+    const [playerId, setPlayerId] = useState("");
     const [progress, setProgress] = useState<Progress>({safe: false, key: false, door: false});
-    const [saving, setSaving] = useState<boolean>(false);
+    //const [saving, setSaving] = useState<boolean>(false);
+    const [saving, setSaving] = useState(false);
+    const [loadingDB, setLoadingDB] = useState(false);
+    const [password, setPassword] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const [actionMessage, setActionMessage] = useState("");
 
     // Hotspot refactoring - contol conditional hostpots
-    /*
-    const hotspotOffsetData = {
-
-        safeSolved: { safe: { x: 0, y: 0}},
-        keySolved: { key: { x: 0, y: 0}},
-        doorSolved: { door: { x: 0, y: 0}},
-    }
-    */
     const hotspotOffsetData: Partial<
         Record<BgState, Partial<Record<Stage, {x: number; y: number }>>>
     > = {
@@ -66,7 +64,7 @@ export default function EscapeRoom() {
     }
 
     // ########## Progress persistence helpers ##########
-    const LS_KEY = "escaperRoomProgress"; // LocalStorageKey
+    const LS_KEY = "escapeRoomProgress"; // LocalStorageKey
     const loadProgress = useCallback((): Progress => {
         try {
             const raw = localStorage.getItem(LS_KEY);
@@ -147,28 +145,32 @@ export default function EscapeRoom() {
         return () => window.removeEventListener("storage", onStorage);
     }, [loadProgress, markSolved]);
 
-    // ########## DB Save will eventually get called here via API ##########
+    // **************************************
+    // ************ API HELPERS *************
+    // **************************************
+
+    // ## Refactored for DB save hooked up to API function ---
     async function saveProgressLogic() {
         try {
             setSaving(true);
-            // TODO
-            // -- Insert API endpoint and auth handling
-            // POST BODY PLACEHOLDER ONLY
-            // May need to handle guest sessions etc...
-            // Consider using tokenised session logic like in previous app
-            const payload = {
-                playerId: playerId || undefined,
-                progress,
-            };
-            // const res = await fetch("/api/progress/save", {
-            //   method: "POST",
-            //   headers: { "Content-Type": "apllication/json" },
-            //   body: JSON.stringify(payload),
-            // });
-            // if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            // const json = await res.json();
-            console.log("mock) saving player progress session to DB storage: ", payload);
-            alert("Progress saved (mock). Replace with real API call.");
+
+            const res = await fetch("/api/player/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    playerId,
+                    password,
+                    progress,
+                }),
+            });
+
+            const data = await res.json(); // handles the call result
+            if (!res.ok) {
+                alert(data?.error ?? "Save failed (.");
+                return;
+            }
+
+            alert("Progress saved successfully!");
         } catch (err: any) {
             console.error(err)
             alert("Porgress failed to save. See output log for error detail.");
@@ -177,34 +179,95 @@ export default function EscapeRoom() {
         }
     }
 
-    // Clickable zones (based on percentages for scaling / responsiveness)
-    // Need to come back to these to do some edits
-    // Add disable state and tool tips to manage progress...
-    // Original
-    /*
-    const zones: Array<{
-        id: "safe" | "key" | "doors";
-        label: string;
-        // percentages [0..100]
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-        onClick: () => void;
-    }> = [{
-        id: "safe",
-        label: "Safe (Combination Game)",
-        left: 3,
-        top: 45,
-        width: 22,
-        height: 35,
-        onClick: () => setBgState((s) => ( s === "base" ? "safeSolved" : s))
-    },
-    {
+    // ------ load progress from db on login and overwrite local storage -----
+    async function loadProgressFromDB() {
+        if (!playerId || !password) {
+            alert("enter player id and password first");
+            // action message update game screen
+            setActionMessage("load failed - use valid credentials");
+            return;
+        }
+        try {
+            // action message update game screen
+            setActionMessage("finding user saved progress...");
+            setLoadingDB(true);
+            const res = await fetch(`/api/player/progress?playerId=${encodeURIComponent(playerId)}&password=${encodeURIComponent(password)}`);
 
+        // Auth case responses
+            if (res.status === 404) {
+                alert("could not load progress - make sure the provided credentials exist or add credentials to create new user first");
+                // action message update game screen
+                setActionMessage(`error could not load progress - check credentials...${res.status}`);
+                return;
+            }
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert(data?.error ?? "could not load progress - storage access error");
+                setActionMessage(`error could not load progress - check credentials...${res.status}`); // user action message update game screen
+                return;
+            }
+
+            const data = await res.json();
+            if (data?.success && data?.progress) {
+                // Trigger a write of the db data to local storage and auto-adjust bgState utelising the existing logics
+                persistProgress({
+                    safe: !!data.progress.safe,
+                    key: !!data.progress.key,
+                    door: !!data.progress.door,
+                });
+                alert("Last play progress loaded form server.");
+                setActionMessage("loaded game progress from last save point");
+            } else {
+                alert("No saved progress found for this player.");
+                setActionMessage("no previous progress found");
+            }
+        } finally {
+            setLoadingDB(false);
+        }
     }
-    ]
-    */
+
+    // ------ Delete Account Function ------
+    async function deleteAccount() {
+        if (!playerId || !password) {
+            alert("enter player id and password first - then attempt delete");
+            setActionMessage("no account found for deletion - check credentials."); // msg to player screen
+            return
+        }
+
+        if (!confirm("Are you sure you want to delete this account?"))  return;
+
+        // action message update game screent
+        setActionMessage("Delete requested.. Attempting user account deletion");
+        try {
+            const res = await fetch(`/api/player/delete`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ playerId, password }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data?.error ?? "account deletion failed");
+                // action message update game screen
+                setActionMessage("account deletion did not complete");
+                return;
+            }
+
+            alert("player account deleted successfully!");
+            localStorage.removeItem("escapeRoomProgress");
+            setPlayerId("");
+            setPassword("");
+            setProgress( { safe: false, key: false, door: false });
+            // action message update game screen
+            setActionMessage("user account deleted");
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting account. See console for details.")
+        }
+    }
+
+
+    // ########## Screen clickable zone management ##########
     // Refactor
     const zones: Array<{
         id: Stage | "keys" | "doors";
@@ -349,33 +412,69 @@ export default function EscapeRoom() {
                             </button>
                         </div>
                     </div>
-
+                    {/* User Input and Button block */}
                     <div className="p-4 rounded-lg border border-zinc-700/80 bg-zinc-900/60">
-                        <h2 className="text-sm font-medium mb-2">Save to Database (placeholder)</h2>
-                        <div className="flex items-center gap-2">
+                        <h2 className="text-sm font-medium mb-3">Save to Database</h2>
+                        { /* Row 1 inputs */ }
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                            {/* Username Input */}
                             <input
                                 value={playerId}
                                 onChange={(e) => setPlayerId(e.target.value)}
                                 placeholder="Player Id / Email"
-                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
+                                className="flex-1 min-w-[240px] px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
                             />
+                            {/* Username Password Input */}
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="enter-password"
+                                className="flex-1 min-w-[240px] px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
+                            />
+                        </div>
+                        { /* Row 2 buttons */ }
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                            {/* Save Progress - Register New User Combo Button */}
                             <button
                                 onClick={saveProgressLogic}
                                 className="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 disabled:opacity-60"
-                                disabled={saving}
+                                disabled={saving || !playerId || !password}
                             >
-                                {saving ? "Saving..." : "Save Progress"}
+                                Register / Save Game
+                            </button>
+                            {/* load progress from DB */}
+                            <button
+                                onClick={loadProgressFromDB}
+                                className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-60"
+                                disabled={loadingDB || !playerId || !password}
+                            >
+                                Load Last Save Point
                             </button>
                         </div>
-                        { /*
-                        <p className="mt-4 text-xs opacity-70">
-                            Add for React Router :
-                            call <code>navigate(`/coding-races/${"safe" | "key" | "door"}`)</code> inside <code>beginStage()</code>.
-                            After a puzzle is solved, set
-                            <code>localStorage.setItem("escapeRoomSolvedStage", stage)</code> in the Coding Races Page
-                            so this menu updates automatically.
-                        </p>
-                        */ }
+
+                        { /* Row 3 buttons */ }
+                        <div className="flex mb-3">
+                            {/* delete player account from DB and reset progress */}
+                            <button
+                                onClick={deleteAccount}
+                                className="px-3 py-2 rounded bg-red-700 hover:bg-red-600 disabled:opacity-60"
+                                disabled={!playerId || !password}
+                            >
+                                Delete Account
+                            </button>
+                        </div>
+
+                        { /* Row 4 status label */ }
+                        <div className="w-full text-center text-xs font-medium text-amber-400 bg-zinc-800/50 border border-zinc-700 rounded p-2">
+                            {saving
+                                ? "Saving... Register user / Save Progress"
+                                : loadingDB
+                                ? "Loading... Loading registered user progress from server storage"
+                                : deleting
+                                ? "...account delete in progress"
+                                : actionMessage || "ready"}
+                        </div>
                     </div>
                 </div>
             </div>
