@@ -443,52 +443,6 @@ export default function EscapeRoom() {
                             </button>
                         </div>
                     </div>
-                    {/* Removing old button block */}
-                    <div className="p-4 rounded-lg border border-zinc-700/80 bg-zinc-900/60">
-                        <h2 className="text-sm font-medium mb-2">Save to Database (placeholder)</h2>
-                        <div className="flex items-center gap-2">
-                            {/* Username Input */}
-                            <input
-                                value={playerId}
-                                onChange={(e) => setPlayerId(e.target.value)}
-                                placeholder="Player Id / Email"
-                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
-                            />
-                            {/* Username Password Input */}
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="enter-password"
-                                className="flex-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm"
-                            />
-                            {/* Save Progress - Register New User Combo Button */}
-                            <button
-                                onClick={saveProgressLogic}
-                                className="px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 disabled:opacity-60"
-                                disabled={saving || !playerId || !password}
-                            >
-                                {saving ? "Saving..." : "Register user / Save Progress"}
-                            </button>
-                            {/* load progress from DB */}
-                            <button
-                                onClick={loadProgressFromDB}
-                                className="px-3 py-2 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-60"
-                                disabled={loadingDB || !playerId || !password}
-                            >
-                                {loadingDB ? "Loading..." : "Loading registered user progress from server storage"}
-                            </button>
-                            {/* delete player account from DB and reset progress */}
-                            <button
-                                onClick={deleteAccount}
-                                className="px-3 py-2 rounded bg-red-700 hover:bg-red-600 disabled:opacity-60"
-                                disabled={!playerId || !password}
-                            >
-                                Delete Account {"account delete in progress"}
-                            </button>
-
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
