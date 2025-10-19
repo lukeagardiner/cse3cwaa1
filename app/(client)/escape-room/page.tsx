@@ -143,7 +143,11 @@ export default function EscapeRoom() {
         return () => window.removeEventListener("storage", onStorage);
     }, [loadProgress, markSolved]);
 
-    // ########## Refactored for DB save hooked up to API function ##########
+    // **************************************
+    // ************ API HELPERS *************
+    // **************************************
+
+    // ## Refactored for DB save hooked up to API function ---
     async function saveProgressLogic() {
         try {
             setSaving(true);
@@ -210,6 +214,15 @@ export default function EscapeRoom() {
             setLoadingDB(false);
         }
     }
+
+    // ------ Delete Account Function ------
+    async function deleteAccount() {
+        if (!playerId || !password) {
+            alert("enter player id and password first - then attempt delete");
+            return
+        }
+    }
+
 
     // ########## Screen clickable zone management ##########
     // Refactor
