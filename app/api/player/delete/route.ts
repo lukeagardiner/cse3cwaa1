@@ -1,4 +1,5 @@
 //app/api/player/delete/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Player, Progress } from "../models";
 

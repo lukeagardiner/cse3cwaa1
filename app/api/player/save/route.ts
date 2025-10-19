@@ -1,5 +1,5 @@
 //app/api/player/save/route/ts
-
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { Player, Progress } from "../models";
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         } else {
             await row.update({ ...progress });;
         }
-        
+
         return NextResponse.json({ success: true });
     } catch (err) {
         console.error(err);

@@ -1,4 +1,5 @@
 //app/api/player/register/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { Player, Progress } from "../models";

@@ -1,5 +1,5 @@
 //app/api/player/login/route.ts
-
+export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Player } from "../models"
 
