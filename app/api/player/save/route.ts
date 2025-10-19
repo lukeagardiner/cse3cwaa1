@@ -2,10 +2,11 @@
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { Player, Progress } from "../models";
+import { Player, Progress, ensureDbSynced } from "../models";
 
 export async function POST(req: Request) {
     try {
+        await ensureDbSynced();
         const { playerId, password, progress } = await req.json();
 
         if (!playerId || !password || !progress) {

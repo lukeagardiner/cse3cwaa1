@@ -1,10 +1,12 @@
 //app/api/player/delete/route.ts
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
-import { Player, Progress } from "../models";
+import { Player, Progress, ensureDbSynced } from "../models";
+
 
 export async function DELETE(req: Request) {
     try {
+        await ensureDbSynced();
         const { playerId, password } = await req.json();
         if (!playerId || !password) return NextResponse.json({ error: "invalid details provided for delete" }, { status: 400 });
 

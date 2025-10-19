@@ -1,10 +1,11 @@
 //app/api/player/login/route.ts
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
-import { Player } from "../models"
+import { Player, ensureDbSynced } from "../models"
 
 export async function POST(req: Request) {
     try {
+        await ensureDbSynced();
         const { playerId, password } = await req.json();
 
         if (!playerId || !password) {

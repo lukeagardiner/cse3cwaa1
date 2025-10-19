@@ -1,10 +1,11 @@
 //app/api/player/progress/route.ts
 export const runtime = "nodejs";
 import { NextResponse } from "next/server";
-import { Player, Progress } from "../models";
+import { Player, Progress, ensureDbSynced } from "../models";
 
 export async function GET(req: Request) {
     try {
+        await ensureDbSynced();
         const { searchParams } = new URL(req.url);
         const playerId = searchParams.get("playerId");
         const password = searchParams.get("password");

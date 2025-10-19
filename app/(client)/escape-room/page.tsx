@@ -64,7 +64,7 @@ export default function EscapeRoom() {
     }
 
     // ########## Progress persistence helpers ##########
-    const LS_KEY = "escaperRoomProgress"; // LocalStorageKey
+    const LS_KEY = "escapeRoomProgress"; // LocalStorageKey
     const loadProgress = useCallback((): Progress => {
         try {
             const raw = localStorage.getItem(LS_KEY);

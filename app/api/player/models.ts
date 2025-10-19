@@ -1,10 +1,15 @@
 //app/api/player/models.ts
+import "server-only";
 import { Sequelize, DataTypes, Model } from "sequelize";
+import path from "node:path";
 import bcrypt from "bcrypt";
+
+// absolute path to the sqlite file in the project root
+const DB_FILE = path.join(process.cwd(), "playerdata.sqlite");
 
 const sequelize = new Sequelize({
     dialect: "sqlite",
-    storage: "./playerdata.sqlite",
+    storage: DB_FILE,
     logging: false,
 });
 
@@ -66,18 +71,9 @@ Progress.init(
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        safe: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-        key: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-        door: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
+        safe: { type: DataTypes.BOOLEAN, defaultValue: false },
+        key: { type: DataTypes.BOOLEAN, defaultValue: false },
+        door: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     { sequelize, modelName: "Progress" }
 );
@@ -86,6 +82,13 @@ Progress.init(
 Player.hasOne(Progress, { foreignKey: "playerId" , onDelete: "CASCADE" });
 Progress.belongsTo(Player, {foreignKey: "playerId"});
 
-sequelize.sync();
+//sequelize.sync();
+// ----- UPDATE TO MAKE SURE SYNC ISN'T AT IMPORT TIME ----
+let _synced = false;
+export async function ensureDbSynced() {
+    if (_synced) return;
+    await sequelize.sync();
+    _synced = true;
+}
 
-export default sequelize;
+//export default sequelize;
