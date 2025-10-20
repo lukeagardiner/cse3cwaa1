@@ -10,4 +10,17 @@ services:
     environment:
      - NODE_ENV=production
     restart: unless-stopped
+    # Resource limits to prevent OOM issues on small instances
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    # Logging configuration to prevent disk space issues
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
