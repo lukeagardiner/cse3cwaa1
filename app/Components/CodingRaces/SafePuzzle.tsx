@@ -25,35 +25,14 @@ type Props = {
 
 // Most basic example without extended conditions above
 /*
-// TBC
-function convertToHex(bin) {
-
-}
-function bruteForce(combination: string) {
-    // ...your code goes here
-    for (let i = 0; i <= 999; i++ {
-        // hint-1 zero-pad to 3 digits if you want to print: i.toString().padStart(3, "0")
-        string code = '';
-        if (i === 0) {
-            code = '000'; // cater to three digits....
-            // also have to cater to leading zeros etc
-        }
-        else {
-            code = i.ToString();
-            // etc, etc
-        }
-        // ----- This block must remain to pass ----
-        if (code === combination) {
-            console.log("You have unlocked the safe");
-            return code;
-        }
-        else {
-            code = ControlCode;
+function bruteForce() {
+    for (let i = 0; i <= 999; i++) {
+        const code = i.toString().padStart(3, '0');
+        if (Number(code) === combination) {
+            console.log("Nice one - you unlocked the safe and got the key!");
+            return parseInt(code, 10);
         }
     }
-    // ----- This block must remain to pass ----
-
-    return code; // failed
 }
  */
 
@@ -343,10 +322,11 @@ export default function SafePuzzle({
                     <details>
                         <summary className="cursor-pointer font medium">Hints</summary>
                         <ul className="list-disc ml-6 space-y-1">
+                            <li>Code in Javascript.</li>
                             <li>The variable <code>combination</code> is a number like <code>4aa</code>.</li>
                             <li>Define a function <code>bruteforce()</code> that returns the correct safe code.</li>
                             <li>Loop from <code>0</code> to <code>999</code> amd compare each value with the <code>combination</code>.</li>
-                            <li>You can emit logs with <code>console.log()</code> - they'll appear in the terminal.</li>
+                            <li>You can write logs with <code>console.log()</code> - they'll appear in the terminal.</li>
                         </ul>
                     </details>
                 </div>

@@ -53,31 +53,14 @@ Example Combination: <b>488</b>
 Hint: The sequence is derived from the 3-digit code on the wall safe.
 
     //AnswerCode:
-    function bruteForce(combination: string) {
-    // ...your code goes here
-    for (let i = 0; i <= 999; i++ {
-        // hint-1 zero-pad to 3 digits if you want to print: i.toString().padStart(3, "0")
-        string code = '';
-        if (i === 0) {
-            code = '000'; // cater to three digits....
-            // also have to cater to leading zeros etc
-        }
-        else {
-            code = i.ToString();
-            // etc, etc
-        }
-        // ----- This block must remain to pass ----
-        if (code === combination) {
-            console.log("You have unlocked the safe");
-            return code;
-        }
-        else {
-            code = ControlCode;
+function bruteForce() {
+    for (let i = 0; i <= 999; i++) {
+        const code = i.toString().padStart(3, '0');
+        if (Number(code) === combination) {
+            console.log("Nice one - you unlocked the safe and got the key!");
+            return parseInt(code, 10); // Avoids getting Not a Number error in the handler
         }
     }
-    // ----- This block must remain to pass ----
-
-    return code; // failed
 }
     </pre>
 
