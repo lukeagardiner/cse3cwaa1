@@ -23,26 +23,9 @@ type Props = {
 // Most basic example without extended conditions above
 /*
 //TBC
-function convertToHex(bin) {
-    const stripInput = String(bin).replace(/\s+/g, "");
-    if (!stripInput) return "";
-    // check for 01 only
-    if (!/^[01]+$/.test(stripInput)) {
-        throw new Error("Input contains non-binary characters.");
-    }
-    // handle padding
-    const padded = stripInput.length % 4 === 0
-        ? stripInput
-        : stripInput.padStart(Math.ceil(stripInput.length / 4) * 4, "0");
-        // convert every block to a hex digit
-        let hex = "";
-        for (let i = 0; i < padded.length; i += 4) {
-            const block = padded.slice(i, i + 4);
-            const value = parseInt(block, 2);
-            hex += value.toString(16);
-        }
+function pickDoor(doors, reportedDoor) {
 
-        return hex.toUpperCase();
+
 }
 */
 
@@ -51,12 +34,12 @@ function convertToHex(bin) {
 // --------- Game Player Instruction and Template ---------
 const DEFAULT_TEMPLATE = `// ==== Key Game: Fix the bug to find the real exit door ===
 // There are 5 doors numbered 1..5. A control system "reports" which door is the exit,
-// but there's a problem in the code. It's your jjob to fix the code so it returns the actual correct dor.
+// but there's a problem in the code. It's your job to fix the code and find the real exit door.
 // problem, the escape room door keypad is hexadecimal your key is in binary. 
 // --Notes:
 // - you get a doors array - the door numbers (e.g., [1,2,3,4,5 ])
 // - mapExit: the broken exit door  
-// - realExit: the real exit door is available to your dcode like other puzzles
+// - realExit: the real exit door is available to your code like other puzzles
 // Implement pickDoor(doors, reportedDoor) and return the correct door number.
 //
 // --- Hints ---
@@ -77,9 +60,9 @@ function pickDoor(doors, reportedDoor) {
   console.log("Checking doors:", doorData.map(d => \`#\${d.door}area=\${d.height * d.width}\`));
 
   // --- BUGGY IMPLEMENTATION ---
-  // The developer tried to find the door whose area is 3x the average of the others,
-  // but they accidentally included the door itself in the average calculation,
-  // which makes the logic always point to the reportedDoor (wrongly).
+  // The map builder tried to implement the code to find the exit door with an area is 3x the average of the others,
+  // but the target door was accidentally included in the average calculation,
+  // this means the game always returns the wrong answer reportedDoor (wrong).
   function findExitDoor() {
     let found = reportedDoor;
     for (const d of doorData) {
@@ -143,10 +126,10 @@ export default function DoorPuzzle({
         };
     }, []);
 
-    // --------- Inputs (randomized once per mount) ---------
+    // --------- Inputs (get a new random value very load ---------
     const doors = useMemo(() => Array.from({ length: doorsCount }, (_, i) => i + 1), [doorsCount]);
 
-    // Pick a reportedDoor randomly…
+    // Random variable door assignment
     const reportedDoorRef = useRef<number>(1 + Math.floor(Math.random() * doorsCount));
     // …then pick a correctDoor that is guaranteed to be different
     // Compute a guaranteed-different correct door
