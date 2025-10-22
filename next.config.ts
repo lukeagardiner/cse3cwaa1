@@ -1,8 +1,9 @@
 import type { NextConfig } from 'next';
 
 const isDev = process.env.NODE_ENV === 'development';
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production'; // For future deployment
 
+// need to load these explicitly as the sequelise packages would not load internally
 const nextConfig: NextConfig = {
     serverExternalPackages: ['sequelize', 'sqlite3', 'bcrypt'],
     reactStrictMode: true,
@@ -10,14 +11,15 @@ const nextConfig: NextConfig = {
     compress: true,
     
     // Disable ESLint and TypeScript checks during production build
-    // This allows the build to succeed even with linting warnings
+    // Suppress linting warning
     eslint: {
         ignoreDuringBuilds: true,
     },
     typescript: {
         ignoreBuildErrors: true,
     },
-    
+
+    // Webpack configurations to load wire-up external packages
     webpack: (config, { isServer }) => {
         if (isServer) {
             config.externals = [
@@ -33,7 +35,7 @@ const nextConfig: NextConfig = {
         return config;
     },
 
-    // Compiler optimizations for production
+    // Compiler optimisations introduced for failing ec2 builds
     compiler: isProd
         ? {
             removeConsole: {

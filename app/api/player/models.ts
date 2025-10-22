@@ -1,13 +1,17 @@
 //app/api/player/models.ts
+import path from "node:path";
 import "server-only";
 import { Sequelize, DataTypes, Model } from "sequelize";
-import path from "node:path";
 import bcrypt from "bcrypt";
 
 // absolute path to the sqlite file in the project root
-const DB_FILE = path.join(process.cwd(), "playerdata.sqlite");
+// adding a switch for test
+const DB_FILE =
+    process.env.NODE_ENV === "test"
+        ? ":memory:"
+        : path.join(process.cwd(), "playerdata.sqlite");
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
     dialect: "sqlite",
     storage: DB_FILE,
     logging: false,
@@ -52,7 +56,11 @@ Player.init(
             allowNull: false,
         },
     },
-    { sequelize, modelName: "Player" }
+    {
+        sequelize,
+        modelName: "Player",
+        timestamps: true,
+    }
 );
 
 // Handle player progress
@@ -62,20 +70,32 @@ export class Progress extends Model {
     declare safe:  boolean;
     declare key:  boolean;
     declare door: boolean;
+    declare createdAt: Date;
     declare updatedAt: Date;
 }
 
 Progress.init(
     {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
         playerId: {
             type: DataTypes.STRING(255),
             allowNull: false,
+            unique: true, // control to make sure there is only one progress row per player
         },
         safe: { type: DataTypes.BOOLEAN, defaultValue: false },
         key: { type: DataTypes.BOOLEAN, defaultValue: false },
         door: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
-    { sequelize, modelName: "Progress" }
+    {
+        sequelize,
+        modelName: "Progress",
+        timestamps: true,
+        indexes: [{ fields: ["playerId"], unique: true }],
+    }
 );
 
 // Relationship definition
@@ -85,10 +105,13 @@ Progress.belongsTo(Player, {foreignKey: "playerId"});
 //sequelize.sync();
 // ----- UPDATE TO MAKE SURE SYNC ISN'T AT IMPORT TIME ----
 let _synced = false;
-export async function ensureDbSynced() {
+export async function ensureDbSynced(opts?:{force? : boolean}) {
+    if (opts?.force) {
+        await sequelize.sync({ force: true });
+        _synced = true;
+        return;
+    }
     if (_synced) return;
     await sequelize.sync();
     _synced = true;
 }
-
-//export default sequelize;
