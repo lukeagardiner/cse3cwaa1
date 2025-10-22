@@ -25,6 +25,8 @@ export async function POST(req: Request) {
         if (!playerId || !password || !progress) {
             return NextResponse.json({ error: "player id / email, password and progress package required"}, { status: 400});
         }
+
+        /*
         let player = await Player.findByPk(playerId);
 
         // **************************************
@@ -45,6 +47,24 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: "Login and save failed with credentials provided. Check provided details before trying again."}, { status: 401});
             }
         }
+         */
+        // **************************************
+        // ******* REGISTRATION AND LOGIN *******
+        // ************ BLOCK (NEW) *************
+        // **************************************
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(playerId);
+        const email = isEmail ? playerId : null;
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // this should handle find or create
+        const [ player, created ] = await Player.findOrCreate({
+            where: { playerId },
+            defaults: { email, passwordHash },
+        });
+
+
+
+
 
         // ------- UPDATE / INSERT PROGRESS -------
         const row = await Progress.findOne({ where: { playerId } }); // Id's are unique but protect against handling multiple
