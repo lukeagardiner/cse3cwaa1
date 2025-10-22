@@ -7,12 +7,24 @@ import { Player, Progress, ensureDbSynced } from "../models";
 export async function POST(req: Request) {
     try {
         await ensureDbSynced();
-        const { playerId, password, progress } = await req.json();
 
+        // Additional block
+        const ct = req.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) {
+            return NextResponse.json({ error: "Invalid content-type. Use application/json."}, { status: 400 });
+        }
+
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON payload" }, { status : 400 });
+        }
+
+        const { playerId, password, progress } = await req.json();
         if (!playerId || !password || !progress) {
             return NextResponse.json({ error: "player id / email, password and progress package required"}, { status: 400});
         }
-
         let player = await Player.findByPk(playerId);
 
         // **************************************
@@ -39,7 +51,7 @@ export async function POST(req: Request) {
         if (!row) {
             await Progress.create({ playerId, ...progress });
         } else {
-            await row.update({ ...progress });;
+            await row.update({ ...progress });
         }
 
         return NextResponse.json({ success: true });
