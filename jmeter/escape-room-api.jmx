@@ -22,6 +22,8 @@
           </elementProp>
         </collectionProp>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Smoke Threads">
@@ -44,7 +46,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{ &quot;playerId&quot;: &quot;${PLAYER_ID}&quot;, &quot;password&quot;: &quot;${PASSWORD}&quot;, &quot;progress&quot;: { &quot;safe&quot;: true, &quot;key&quot;: false, &quot;door&quot;: false } }</stringProp>
+                <stringProp name="Argument.value">{ &quot;playerId&quot;: &quot;${PLAYER_ID}&quot;, &quot;password&quot;: &quot;${PASSWORD}&quot;, &quot;progress&quot;: { &quot;safe&quot;:true, &quot;key&quot;: false, &quot;door&quot;: false } }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -61,8 +63,9 @@
           </HeaderManager>
           <hashTree/>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Save 200 OK" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="120634261">&quot;success&quot;: true</stringProp>
+            <collectionProp name="Asserion.test_strings"/>
+            <collectionProp name="Assertion.test_strings">
+              <stringProp name="120634261">&quot;success&quot;:true</stringProp>
             </collectionProp>
             <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
             <intProp name="Assertion.test_type">16</intProp>
@@ -81,8 +84,9 @@
         </HTTPSamplerProxy>
         <hashTree>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Load 200 OK" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="120634261">&quot;success&quot;: true</stringProp>
+            <collectionProp name="Asserion.test_strings"/>
+            <collectionProp name="Assertion.test_strings">
+              <stringProp name="120634261">&quot;success&quot;:true</stringProp>
             </collectionProp>
             <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
             <intProp name="Assertion.test_type">16</intProp>
@@ -117,8 +121,9 @@
           </HeaderManager>
           <hashTree/>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Delete 200/204" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="120634261">&quot;success&quot;: true</stringProp>
+            <collectionProp name="Asserion.test_strings"/>
+            <collectionProp name="Assertion.test_strings">
+              <stringProp name="120634261">&quot;success&quot;:true</stringProp>
             </collectionProp>
             <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
             <intProp name="Assertion.test_type">16</intProp>
@@ -164,7 +169,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="parameters"></stringProp>
