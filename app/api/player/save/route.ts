@@ -21,7 +21,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid JSON payload" }, { status : 400 });
         }
 
-        const { playerId, password, progress } = await req.json();
+        const { playerId, password, progress } = body ?? {};
         if (!playerId || !password || !progress) {
             return NextResponse.json({ error: "player id / email, password and progress package required"}, { status: 400});
         }
