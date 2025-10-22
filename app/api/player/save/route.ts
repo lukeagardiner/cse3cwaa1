@@ -25,6 +25,8 @@ export async function POST(req: Request) {
         if (!playerId || !password || !progress) {
             return NextResponse.json({ error: "player id / email, password and progress package required"}, { status: 400});
         }
+
+        /*
         let player = await Player.findByPk(playerId);
 
         // **************************************
@@ -45,7 +47,40 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: "Login and save failed with credentials provided. Check provided details before trying again."}, { status: 401});
             }
         }
+         */
+        // **************************************
+        // ******* REGISTRATION AND LOGIN *******
+        // ************ BLOCK (NEW) *************
+        // **************************************
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(playerId);
+        const email = isEmail ? playerId : null;
+        const passwordHash = await bcrypt.hash(password, 10);
 
+        // this should handle find or create
+        const [ player, created ] = await Player.findOrCreate({
+            where: { playerId },
+            defaults: { email, passwordHash },
+        });
+
+        if (!created) {
+            // existing player or user can validate password
+            const auth = await player.validPassword(password);
+            if (!auth) {
+                return NextResponse.json(
+                    { error: "Login and/ or save failed with the user credentials provided. Check credentials are valid" },
+                    { status: 401 }
+                );
+            }
+        } else {
+            // this should be first interaction... ensure progress rows exist
+            await Progress.findOrCreate({
+                where: { playerId },
+                defaults: { safe: false, key: false, door: false },
+            });
+        }
+
+        // Also updating this block as failing at rate of JMETER tests
+        /*
         // ------- UPDATE / INSERT PROGRESS -------
         const row = await Progress.findOne({ where: { playerId } }); // Id's are unique but protect against handling multiple
         if (!row) {
@@ -53,6 +88,9 @@ export async function POST(req: Request) {
         } else {
             await row.update({ ...progress });
         }
+         */
+        // ------- UPDATE / INSERT PROGRESS ( NEW - UPSERT ) -------
+        await Progress.upsert({ playerId, ...progress });
 
         return NextResponse.json({ success: true });
     } catch (err) {
