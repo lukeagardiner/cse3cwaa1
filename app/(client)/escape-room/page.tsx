@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 /**
  * Escape room menu
  * - Add responsive layout with clickable zones
- * - Alternative background images for state vairants
+ * - Alternative background images for state conditions / levels
  * - Zones are identified in percentages so they scale with image
- * - Keyboard accessible and optional debug / dev mode outlines
+ * - Action cards are invluded with a view to keyboard accessible and optional debug / dev mode outlines
  */
 
 // ----- Types
@@ -110,11 +110,6 @@ export default function EscapeRoom() {
         if (stage === "safe") setBgState("safeSolved");
         if (stage === "key") setBgState("keySolved");
         if (stage === "door") setBgState("doorSolved");
-
-        // React Router usage placeholder
-        // navigate(`/coding-races/${stage}`/};
-        // Alternative is callback/dispatch to game shell or dynamic puzzle load
-        // alert(`Enter stage:  ${stage} → load Coding Races`); // Replaced when implementing dynamic puzzle routing
         router.push(`/coding-races/${stage}`);
     }
 
