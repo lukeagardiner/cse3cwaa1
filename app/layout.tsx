@@ -10,8 +10,8 @@ import Breadcrumbs from "./Components/Breadcrumbs";
 const inter = Inter({ subsets: ['latin']});
 
 export const metadata: Metadata = {
-  title: 'CSE3CWA - Assessment 1',
-  description: 'Assignment 1 for Subject Cloud Web Application',
+  title: 'CSE3CWA - Assessment 2',
+  description: 'Assignment 2 for Subject Cloud Web Application',
 }
 
 export default function RootLayout({
