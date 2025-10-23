@@ -17,6 +17,33 @@ export default function AboutPage() {
             </dl>
 
             <h2 style={{ fontSize: '1.5rem', lineHeight: 1.3, fontWeight: 700, margin: '2rem 0 .5rem', textAlign: 'center' }}>
+                How To Play - Escape Room Overview
+            </h2>
+            <figure style={{ margin: 0 }}>
+                <video
+                    controls
+                    preload="metadata"
+                    playsInline
+                    style={{
+                        display: 'block',
+                        width: '100%',
+                        borderRadius: 8,
+                        border: '1px solid var(--border, #d0d7de)',
+                        background: '#000'
+                    }}
+                    aria-label="How to play escape room and site explanation"
+                >
+                    <source src="/videos/escaperoomvideo.mp4" type="video/mp4" />
+                    Sorry, your browser doesn't support embedded videos. You can download the video here:
+                    <a href='/videos/escaperoomvideo.mp4'>Download MP4</a>
+                </video>
+                <figcaption style={{ marginTop: '0.5rem', color: '#666', textAlign: 'center' }}>
+                    Having trouble? <a href='/videos/howto.mp4'>Download the MP4</a>
+                </figcaption>
+            </figure>
+
+
+            <h2 style={{ fontSize: '1.5rem', lineHeight: 1.3, fontWeight: 700, margin: '2rem 0 .5rem', textAlign: 'center' }}>
                 How to use this site (Video)
             </h2>
             <figure style={{ margin: 0 }}>
