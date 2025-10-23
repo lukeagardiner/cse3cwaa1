@@ -151,6 +151,7 @@ export default function EscapeRoom() {
 
     // ## Refactored for DB save hooked up to API function ---
     async function saveProgressLogic() {
+        performance.mark('save-start'); // added for instrumentation
         try {
             setSaving(true);
 
@@ -176,6 +177,11 @@ export default function EscapeRoom() {
             alert("Porgress failed to save. See output log for error detail.");
         } finally {
             setSaving(false);
+            // ---- process instrumentaion results ---
+            performance.mark('save-end');
+            performance.measure('save', 'save-start', 'save-end');
+            const duration = performance.getEntriesByName('save')[0]?.duration;
+            console.log('perf:save(ms)=', duration?.toFixed(1));
         }
     }
 

@@ -3,8 +3,12 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { Player, Progress, ensureDbSynced } from "../models";
+import { withTiming } from '../_util/timer';
 
 export async function POST(req: Request) {
+    // added for timer
+    const t1 = await withTiming('parse', async () => await req.json());
+
     try {
         await ensureDbSynced();
 
@@ -14,12 +18,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid content-type. Use application/json."}, { status: 400 });
         }
 
+        /*
         let body: any;
         try {
             body = await req.json();
         } catch {
             return NextResponse.json({ error: "Invalid JSON payload" }, { status : 400 });
         }
+         */
+
+
+        const body = t1.res; //aded for timer
 
         const { playerId, password, progress } = body ?? {};
         if (!playerId || !password || !progress) {
@@ -92,7 +101,13 @@ export async function POST(req: Request) {
         // ------- UPDATE / INSERT PROGRESS ( NEW - UPSERT ) -------
         await Progress.upsert({ playerId, ...progress });
 
-        return NextResponse.json({ success: true });
+        // adding Instrumentation timing
+        const total = t1.ms; // can optionally + oher segments here if timing them - now add it into the success response
+        // return if successful - now with timing
+        // return NextResponse.json({ success: true });// original - now
+        const r = NextResponse.json({ success: true });
+        r.headers.set('Server-Timing', `total;dur=${total.toFixed(1)}`);
+        return r;
     } catch (err) {
         console.error(err);
         return NextResponse.json({ error: "save operation failed" }, { status: 500 });
