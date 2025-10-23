@@ -37,7 +37,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Register/Save">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Register/Save" enabled="true">
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
           <stringProp name="HTTPSampler.path">${BASE_URL}/api/player/save</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -53,7 +53,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON Header">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON Header" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
@@ -62,7 +62,7 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Save 200 OK">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Save 200 OK" enabled="true">
             <collectionProp name="Asserion.test_strings"/>
             <collectionProp name="Assertion.test_strings">
               <stringProp name="120634261">&quot;success&quot;:true</stringProp>
@@ -74,7 +74,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Load Progress">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Load Progress" enabled="true">
           <stringProp name="HTTPSampler.path">${BASE_URL}/api/player/progress?playerId=${__urlencode(${PLAYER_ID})}&amp;password=${__urlencode(${PASSWORD})}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
@@ -83,7 +83,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Load 200 OK">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Load 200 OK" enabled="true">
             <collectionProp name="Asserion.test_strings"/>
             <collectionProp name="Assertion.test_strings">
               <stringProp name="120634261">&quot;success&quot;:true</stringProp>
@@ -95,7 +95,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Account">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Account" enabled="true">
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
           <stringProp name="HTTPSampler.path">${BASE_URL}/api/player/delete</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
@@ -111,7 +111,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON Header">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON Header" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
@@ -120,7 +120,7 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Delete 200/204">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Delete 200/204" enabled="true">
             <collectionProp name="Asserion.test_strings"/>
             <collectionProp name="Assertion.test_strings">
               <stringProp name="120634261">&quot;success&quot;:true</stringProp>
@@ -169,7 +169,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="parameters"></stringProp>
